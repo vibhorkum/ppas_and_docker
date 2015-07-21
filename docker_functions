@@ -35,8 +35,6 @@
 # verify any  undefined shell variables
 set -u
 
-export DOCKERS_HOME=/Users/VibhorKumar/Downloads/docker
-export DOCKER_IMAGES=/Users/VibhorKumar/Downloads/docker/images
 export DOCKER_HOST=tcp://$(/usr/local/bin/boot2docker ip 2>/dev/null):2376
 export DOCKER_CERT_PATH=/Users/VibhorKumar/.boot2docker/certs/boot2docker-vm
 export DOCKER_TLS_VERIFY=1
