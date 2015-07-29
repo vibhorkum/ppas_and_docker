@@ -1,0 +1,7 @@
+[ppas94]
+name=Postgres Plus Advanced Server 9.4 $releasever - $basearch
+baseurl=http://edb-richardyen:84369c4ca2a26399e438f00a7eec17c2@yum.enterprisedb.com/9.4/redhat/rhel-$releasever-$basearch
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/ENTERPRISEDB-GPG-KEY
+
