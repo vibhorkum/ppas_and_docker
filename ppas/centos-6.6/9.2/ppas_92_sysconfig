@@ -1,5 +1,0 @@
-PGENGINE=/usr/ppas-9.2/bin
-PGPORT=5432
-PGDATA=/var/lib/ppas/9.2/data
-PGLOG=/var/lib/ppas/9.2/pgstartup.log
-#INITDBOPTS="--no-redwood-compat"
