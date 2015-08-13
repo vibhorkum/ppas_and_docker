@@ -4,9 +4,8 @@ MAINTAINER vibhor.aim@gmail.com
 # COPY all repository and Keys.
 RUN mkdir -p /run/lock
 RUN mkdir -p /var/lock/subsys
-COPY pgdg-centos91-9.1-4.noarch.rpm /root/
-RUN rpm -ivh /root/pgdg-centos91-9.1-4.noarch.rpm
 COPY rpmforge.repo /etc/yum.repos.d/
+COPY ppas91.repo /etc/yum.repos.d/
 COPY epel.repo /etc/yum.repos.d/
 COPY epel-testing.repo /etc/yum.repos.d/
 COPY enterprisedb-tools.repo /etc/yum.repos.d/
@@ -30,12 +29,12 @@ RUN yum install -y       \
    man                   \
    wget                  \
    net-tools
-RUN yum -y install postgresql91-server.x86_64 java-1.8.0-openjdk-devel.x86_64
+RUN yum -y install --nogpgcheck -y ppas91 java-1.8.0-openjdk-devel.x86_64 ppas-xdb.x86_64 ppas-xdb-console.x86_64 ppas-xdb-libs.x86_64 ppas-xdb-publisher.x86_64
 
 # setting postgres user for login
-RUN perl -i -pe 's|. /etc/sysconfig/network||' /etc/init.d/postgresql-9.1
+RUN perl -i -pe 's|. /etc/sysconfig/network||' /etc/init.d/ppas-9.1
 RUN perl -i -pe 's|^UsePAM yes|UsePAM no|' /etc/ssh/sshd_config
-# RUN adduser --home-dir /home/postgres --create-home postgres
+ RUN adduser --home-dir /home/postgres --create-home postgres
 RUN echo 'postgres   ALL=(ALL)   NOPASSWD: ALL' >> /etc/sudoers
 RUN echo 'postgres:postgres'|chpasswd
 # permitting root login
@@ -43,17 +42,16 @@ RUN mkdir /var/run/sshd
 RUN echo 'root:root' | chpasswd
 RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
+RUN service ppas-9.1 initdb
+COPY pg_conf/postgresql.conf /var/lib/ppas-9.1/data/postgresql.conf
+COPY pg_conf/pg_hba.conf /var/lib/ppas-9.1/data/pg_hba.conf
+COPY edb-repl.conf /etc/edb-repl.conf
+
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
 # expose ports.
-EXPOSE 5432 22 80 8080
+EXPOSE 5432 22 80 8080 9051
 
 # start sshd daemon so that we can do ssh
 CMD ["/usr/sbin/sshd", "-D"]
-
-RUN service postgresql-9.1 initdb
-ADD pg_conf/pg_hba.conf /var/lib/pgsql/9.1/data/pg_hba.conf
-ADD pg_conf/postgresql.conf /var/lib/pgsql/9.1/data/postgresql.conf
-# COPY ppas_env.sh /etc/profile.d/ppas_env.sh
-CMD service postgresql-9.1 start
