@@ -34,7 +34,7 @@ RUN yum -y install --nogpgcheck -y ppas91 java-1.8.0-openjdk-devel.x86_64 ppas-x
 # setting postgres user for login
 RUN perl -i -pe 's|. /etc/sysconfig/network||' /etc/init.d/ppas-9.1
 RUN perl -i -pe 's|^UsePAM yes|UsePAM no|' /etc/ssh/sshd_config
- RUN adduser --home-dir /home/postgres --create-home postgres
+RUN adduser --home-dir /home/postgres --create-home postgres
 RUN echo 'postgres   ALL=(ALL)   NOPASSWD: ALL' >> /etc/sudoers
 RUN echo 'postgres:postgres'|chpasswd
 # permitting root login
@@ -42,10 +42,13 @@ RUN mkdir /var/run/sshd
 RUN echo 'root:root' | chpasswd
 RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
+COPY ppas_91_sysconfig /etc/sysconfig/ppas/ppas-9.1
 RUN service ppas-9.1 initdb
-COPY pg_conf/postgresql.conf /var/lib/ppas-9.1/data/postgresql.conf
-COPY pg_conf/pg_hba.conf /var/lib/ppas-9.1/data/pg_hba.conf
+COPY pg_conf/postgresql.conf /var/lib/ppas/9.1/data/postgresql.conf
+COPY pg_conf/pg_hba.conf /var/lib/ppas/9.1/data/pg_hba.conf
+COPY ppas_env.sh /etc/profile.d/ppas_env.sh
 COPY edb-repl.conf /etc/edb-repl.conf
+COPY xdb_repsvrfile.conf /usr/ppas-xdb-5.1/etc/xdb_repsvrfile.conf
 
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
@@ -54,4 +57,4 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 EXPOSE 5432 22 80 8080 9051
 
 # start sshd daemon so that we can do ssh
-CMD ["/usr/sbin/sshd", "-D"]
+CMD service ppas-9.1 start && /usr/sbin/sshd -D
