@@ -49,6 +49,7 @@ COPY pg_conf/pg_hba.conf /var/lib/ppas/9.1/data/pg_hba.conf
 COPY ppas_env.sh /etc/profile.d/ppas_env.sh
 COPY edb-repl.conf /etc/edb-repl.conf
 COPY xdb_repsvrfile.conf /usr/ppas-xdb-5.1/etc/xdb_repsvrfile.conf
+COPY build_xdb.sh /usr/ppas-xdb-5.1/bin/build_xdb.sh
 
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
