@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# install sslutils
+cd /root/sslutils
+make USE_PGXS=1 
+make USE_PGXS=1 install
+
 # create placeholder dirs
 mkdir -p /opt/apache-php
 mkdir -p /opt/php_edbpem

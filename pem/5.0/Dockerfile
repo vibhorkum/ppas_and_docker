@@ -15,6 +15,9 @@ COPY RPM-GPG-KEY-rpmforge-dag /etc/pki/rpm-gpg/
 COPY RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
 COPY ENTERPRISEDB-GPG-KEY /etc/pki/rpm-gpg/
 
+COPY http://get.enterprisedb.com/src/sslutils-3.0.0.tar.gz /root/sslutils-3.0.0.tar.gz
+RUN tar xvzf /root/sslutils-3.0.0.tar.gz -C /root/
+
 # run update and install require packages.
 RUN yum update -y
 RUN yum install -y       \
@@ -31,6 +34,8 @@ RUN yum install -y       \
    wget                  \
    ppas94                \
    net-tools             \
+	 openssl-devel         \
+	 gcc                   \
 	 pem-agent-5.0.2-1.rhel6
 
 # setting postgres user for login
