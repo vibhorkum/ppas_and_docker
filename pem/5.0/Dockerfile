@@ -15,9 +15,6 @@ COPY RPM-GPG-KEY-rpmforge-dag /etc/pki/rpm-gpg/
 COPY RPM-GPG-KEY-EPEL-6 /etc/pki/rpm-gpg/
 COPY ENTERPRISEDB-GPG-KEY /etc/pki/rpm-gpg/
 
-COPY http://get.enterprisedb.com/src/sslutils-3.0.0.tar.gz /root/sslutils-3.0.0.tar.gz
-RUN tar xvzf /root/sslutils-3.0.0.tar.gz -C /root/
-
 # run update and install require packages.
 RUN yum update -y
 RUN yum install -y       \
@@ -37,6 +34,9 @@ RUN yum install -y       \
 	 openssl-devel         \
 	 gcc                   \
 	 pem-agent-5.0.2-1.rhel6
+
+RUN wget -q --user=<user> --password=<password> --directory-prefix=/root/ http://get.enterprisedb.com/src/sslutils-3.0.0.tar.gz
+RUN tar xvzf /root/sslutils-3.0.0.tar.gz -C /root/
 
 # setting postgres user for login
 RUN perl -i -pe 's|. /etc/sysconfig/network||' /etc/init.d/ppas-9.4
@@ -67,7 +67,8 @@ COPY apache_php_install_optionfile /root/apache_php_install_optionfile
 COPY pem_install_optionfile /root/pem_install_optionfile
 
 # Requires VPN connection
-COPY https://builds.enterprisedb.com/builds/Releases/PEM/v5.0.0/GA/server/pem_server-5.0.0-2-linux-x64.run /root/pem_server-5.0.0-2-linux-x64.run
+RUN wget -q --user=<user> --password=<password> --directory-prefix=/root/ https://builds.enterprisedb.com/builds/Releases/PEM/v5.0.0/GA/server/pem_server-5.0.0-2-linux-x64.run
+RUN chmod 755 /root/pem_server-5.0.0-2-linux-x64.run
 
 # allow user to decide which/where to install PEM server
 COPY install_pem_server.sh /root/install_pem_server.sh
