@@ -32,11 +32,10 @@ RUN yum install -y       \
    ppas94                \
    net-tools             \
 	 openssl-devel         \
-	 gcc                   \
-	 pem-agent-5.0.2-1.rhel6
+	 gcc
 
 RUN wget -q --user=<user> --password=<password> --directory-prefix=/root/ http://get.enterprisedb.com/src/sslutils-3.0.0.tar.gz
-RUN tar xvzf /root/sslutils-3.0.0.tar.gz -C /root/
+RUN tar xvjf /root/sslutils-1.1.tar.bz2 -C /root/
 
 # setting postgres user for login
 RUN perl -i -pe 's|. /etc/sysconfig/network||' /etc/init.d/ppas-9.4
@@ -70,8 +69,9 @@ COPY pem_install_optionfile /root/pem_install_optionfile
 RUN wget -q --user=<user> --password=<password> --directory-prefix=/root/ https://builds.enterprisedb.com/builds/Releases/PEM/v5.0.0/GA/server/pem_server-5.0.0-2-linux-x64.run
 RUN chmod 755 /root/pem_server-5.0.0-2-linux-x64.run
 
-# allow user to decide which/where to install PEM server
+# allow user to decide which/where to install PEM server/agent
 COPY install_pem_server.sh /root/install_pem_server.sh
+COPY install_pem_agent.sh /root/install_pem_agent.sh
 
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
@@ -80,4 +80,4 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 EXPOSE 5432 22 80 8080 8443
 
 # start sshd daemon so that we can do ssh
-CMD service ppas-9.4 start && service pemagent start && /usr/sbin/sshd -D
+CMD service ppas-9.4 start && /usr/sbin/sshd -D
