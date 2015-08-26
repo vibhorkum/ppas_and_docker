@@ -386,7 +386,7 @@ function create_standby()
    local STANDBY_NAME=$2
    local STANDBY_IMAGE=$3
    
-   MASTER_IP=$(docker exec -it ${MASTER} ifconfig eth0 |grep netmask|awk '{print $2}')
+   MASTER_IP=$(docker exec -it ${MASTER} hostname -i)
    
    plog "creating container ${STANDBY_NAME}"
    create_container ${STANDBY_NAME} ${STANDBY_IMAGE} 
