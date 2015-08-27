@@ -57,19 +57,18 @@ RUN mkdir -p /var/lib/ppas/9.4/wal_archive
 RUN chown -R enterprisedb:enterprisedb /var/lib/ppas
 RUN chown enterprisedb:enterprisedb /opt/backup
 
-# set standby-creation script in case container is going to be used for standby
-COPY create_standby.sh /usr/ppas-9.4/bin
-
 # copy EFM files into place
+COPY set_as_master.sh /usr/efm-2.0/bin/set_as_master.sh
 COPY set_as_witness.sh /usr/efm-2.0/bin/set_as_witness.sh
+COPY set_as_standby.sh /usr/efm-2.0/bin/set_as_standby.sh
+COPY efm.properties /etc/efm-2.0/efm.properties
 RUN cp /etc/efm-2.0/efm.nodes.in /etc/efm-2.0/efm.nodes
-RUN cp /etc/efm-2.0/efm.properties.in /etc/efm-2.0/efm.properties
 
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
 # expose ports.
-EXPOSE 5432 22 80 8080
+EXPOSE 5432 22 80 8080 5431 5430
 
 # start sshd daemon so that we can do ssh
 CMD /usr/sbin/sshd -D
