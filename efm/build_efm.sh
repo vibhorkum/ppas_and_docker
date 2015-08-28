@@ -9,7 +9,7 @@ then
   exit 0
 fi
 
-IMAGE_NAME="efm:5"
+IMAGE_NAME="efm:2"
 if [[ ${1} == 'image' ]]
 then
   # Warn user before building image--give them a chance to stop and go set the passwords
