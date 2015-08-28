@@ -56,4 +56,4 @@ do
 done
 
 # Check uptime
-docker exec -it xdb1  17 java -jar /usr/ppas-xdb-5.1/bin/edb-repcli.jar -repsvrfile /usr/ppas-xdb-5.1/etc/xdb_repsvrfile.conf -uptime
+docker exec -it xdb1 java -jar /usr/ppas-xdb-5.1/bin/edb-repcli.jar -repsvrfile /usr/ppas-xdb-5.1/etc/xdb_repsvrfile.conf -uptime
