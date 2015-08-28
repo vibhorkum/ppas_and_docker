@@ -14,7 +14,7 @@ sed -i "s/pem_port=.*/pem_port=5432/" /usr/pem-5.0/etc/agent.cfg
 sed -i "s/agent_id=.*/agent_id=${AGENT_ID}/" /usr/pem-5.0/etc/agent.cfg
 
 #register agent
- /usr/pem-5.0/bin/pemagent --register-agent --pem-server ${PEM_SERVER_IP} --pem-user enterprisedb --display-name ${CONTAINER_NAME}
+/usr/pem-5.0/bin/pemagent --register-agent --pem-server ${PEM_SERVER_IP} --pem-user enterprisedb --display-name ${CONTAINER_NAME}
 
 # start agent
 service pemagent start

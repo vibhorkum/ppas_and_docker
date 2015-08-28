@@ -34,8 +34,8 @@ RUN yum install -y       \
 	 openssl-devel         \
 	 gcc
 
-RUN wget -q --user=<user> --password=<password> --directory-prefix=/root/ http://get.enterprisedb.com/src/sslutils-3.0.0.tar.gz
-RUN tar xvzf /root/sslutils-3.0.0.tar.gz -C /root/
+RUN wget -q --user=<user> --password=<password> --directory-prefix=/root/ http://get.enterprisedb.com/src/sslutils-1.1.tar.bz2
+RUN tar xvjf /root/sslutils-1.1.tar.bz2 -C /root/
 
 # setting postgres user for login
 RUN perl -i -pe 's|. /etc/sysconfig/network||' /etc/init.d/ppas-9.4
