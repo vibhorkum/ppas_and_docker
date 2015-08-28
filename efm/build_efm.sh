@@ -1,5 +1,7 @@
 #!/bin/bash
 
+IMAGE_NAME="efm:2"
+
 if [[ ${1} == 'destroy' ]]
 then
   for i in master standby witness
@@ -9,7 +11,6 @@ then
   exit 0
 fi
 
-IMAGE_NAME="efm:2"
 if [[ ${1} == 'image' ]]
 then
   # Warn user before building image--give them a chance to stop and go set the passwords
