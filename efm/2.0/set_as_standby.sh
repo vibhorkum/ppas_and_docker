@@ -19,7 +19,7 @@ mkdir -p ${DATADIR}
 pg_basebackup -U repuser -h ${MASTER_HOST} -D ${DATADIR} -xPR
 
 # Fix up confs so that this machine is a valid EFM standby
-echo "trigger_file='/tmp/efm_slave_trigger'" >> ${DATADIR}/recovery.conf
+echo "trigger_file='/tmp/efm_standby_trigger'" >> ${DATADIR}/recovery.conf
 if [[ `grep -c "^hot_standby" ${DATADIR}/postgresql.conf` -gt 0 ]]
 then
     sed -i "s/^hot_standby.*/hot_standby = on/" ${DATADIR}/postgresql.conf
