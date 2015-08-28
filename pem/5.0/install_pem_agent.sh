@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PEM_SERVER_IP=''
+PEM_SERVER_IP=${1}
 CONTAINER_NAME=`hostname`
 AGENT_ID=`hostname -i | cut -f4 -d '.'`
 
