@@ -1,4 +1,4 @@
-enterprisedb-tools]
+[enterprisedb-tools]
 name=EnterpriseDB Tools $releasever - $basearch
 baseurl=http://<username>:<password>@yum.enterprisedb.com/tools/redhat/rhel-$releasever-$basearch
 enabled=1
