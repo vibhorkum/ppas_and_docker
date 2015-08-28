@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # install sslutils
-cd /root/sslutils-1.1
+cd /root/sslutils
 make USE_PGXS=1 
 make USE_PGXS=1 install
 
