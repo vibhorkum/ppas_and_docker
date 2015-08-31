@@ -4,6 +4,12 @@ IMAGE_NAME="pem:5"
 EDB_LOGIN=''
 EDB_PASSWORD=''
 
+if [[ "x${EDB_LOGIN}" == "x" || "x${EDB_PASSWORD}" == "x" ]]
+then
+  echo "Please fill in your EDB login and password in ${0}"
+	exit 1
+fi
+
 if [[ ${1} == 'destroy' ]]
 then
   for i in server agent1 agent2
@@ -43,6 +49,7 @@ for i in 1 2
 do
   MASTER_IP=`docker exec -it pem-server ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
   docker exec -t pem-agent${i} bash --login -c "/root/install_pem_agent.sh ${MASTER_IP}"
+  docker exec -t pem-agent${i} bash --login -c "service pemagent start && tail -f /dev/null" &
 done
 
 if [[ `uname` = 'Darwin' ]]
