@@ -4,12 +4,6 @@ IMAGE_NAME="pem:5"
 EDB_LOGIN=''
 EDB_PASSWORD=''
 
-if [[ "x${EDB_LOGIN}" == "x" || "x${EDB_PASSWORD}" == "x" ]]
-then
-  echo "Please fill in your EDB login and password in ${0}"
-	exit 1
-fi
-
 if [[ ${1} == 'destroy' ]]
 then
   for i in server agent1 agent2
@@ -17,6 +11,12 @@ then
     docker rm -f pem-${i}
   done
   exit 0
+fi
+
+if [[ "x${EDB_LOGIN}" == "x" || "x${EDB_PASSWORD}" == "x" ]]
+then
+  echo "Please fill in your EDB login and password in ${0}"
+	exit 1
 fi
 
 if [[ ${1} == 'image' ]]
