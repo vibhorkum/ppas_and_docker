@@ -25,17 +25,15 @@ RUN yum install -y       \
    openssh-server        \
    openssh-clients       \
    file                  \
-	 tar                   \
+   tar                   \
    sudo                  \
    man                   \
    wget                  \
    ppas94                \
+   ppas94-server-sslutils \
    net-tools             \
-	 openssl-devel         \
-	 gcc
-
-RUN wget -q --user=<user> --password=<password> --directory-prefix=/root/ http://get.enterprisedb.com/src/sslutils-1.1.tar.bz2
-RUN tar xvjf /root/sslutils-1.1.tar.bz2 -C /root/
+   openssl-devel         \
+   gcc
 
 # setting postgres user for login
 RUN perl -i -pe 's|. /etc/sysconfig/network||' /etc/init.d/ppas-9.4
