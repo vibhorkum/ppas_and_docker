@@ -33,22 +33,22 @@ do
   docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} ${IMAGE_NAME}
 done
 
-printf "\e[0;32m>>> SETTING UP MASTER DATABASE\n\e[0m"
 # Set up master
+printf "\e[0;32m>>> SETTING UP MASTER DATABASE\n\e[0m"
 docker exec -it efm-master bash --login -c "/usr/efm-2.0/bin/set_as_master.sh"
 
-printf "\e[0;32m>>> REGISTERING STANDBY INTO EFM\n\e[0m"
 # Register standby
+printf "\e[0;32m>>> REGISTERING STANDBY INTO EFM\n\e[0m"
 STANDBY_IP=`docker exec -it efm-standby ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
 docker exec -t efm-master /usr/efm-2.0/bin/efm add-node efm ${STANDBY_IP} 1
 
-printf "\e[0;32m>>> SETTING UP STREAMING REPLICATION\n\e[0m"
-# Register standby
 # Set up standby
+printf "\e[0;32m>>> SETTING UP STREAMING REPLICATION\n\e[0m"
 MASTER_IP=`docker exec -it efm-master ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
 docker exec -t efm-standby bash --login -c "echo ${MASTER_IP}:5430 >> /etc/efm-2.0/efm.nodes"
 docker exec -t efm-standby bash --login -c "/usr/efm-2.0/bin/set_as_standby.sh ${MASTER_IP}"
 
+# Verify replication is working
 printf "\e[0;33m==== Verifying Streaming Replication Functionality ====\n\e[0m"
 docker exec -t efm-master bash --login -c "psql -ac 'CREATE TABLE efm_test (id serial primary key, filler text)' edb enterprisedb"
 sleep 5
@@ -57,13 +57,13 @@ docker exec -t efm-master bash --login -c "psql -ac 'INSERT INTO efm_test VALUES
 sleep 5
 docker exec -t efm-standby bash --login -c "psql -ac 'SELECT * FROM efm_test' edb enterprisedb"
 
-printf "\e[0;32m>>> REGISTERING WITNESS INTO EFM\n\e[0m"
 # Register witness
+printf "\e[0;32m>>> REGISTERING WITNESS INTO EFM\n\e[0m"
 WITNESS_IP=`docker exec -it efm-witness ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
 docker exec -t efm-master /usr/efm-2.0/bin/efm add-node efm ${WITNESS_IP} 1
 
-printf "\e[0;32m>>> STARTING UP WITNESS EFM PROCESS\n\e[0m"
 # Set up witness
+printf "\e[0;32m>>> STARTING UP WITNESS EFM PROCESS\n\e[0m"
 docker exec -t efm-witness bash --login -c "echo ${MASTER_IP}:5430 ${STANDBY_IP}:5430 >> /etc/efm-2.0/efm.nodes"
 docker exec -t efm-witness /usr/efm-2.0/bin/set_as_witness.sh
 
