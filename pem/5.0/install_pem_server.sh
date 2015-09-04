@@ -12,7 +12,7 @@ mkdir -p /opt/php_edbpem
 # install Apache/PHP
 APACHEPHP_INSTALL=`ls /opt/apache-php | grep apachephp-.*-linux-x64.run`
 PHP_EDBPEM_INSTALL=`ls /opt/php_edbpem | grep php_edbpem-.*-linux-x64.run`
-/opt/apache-php/${APACHEPHP_INSTALL} --mode unattended --optionfile /root/apache_php_install_optionfile
+/opt/apache-php/${APACHEPHP_INSTALL} --mode unattended --prefix /usr/edb-apache-php
 /opt/php_edbpem/${PHP_EDBPEM_INSTALL} --mode unattended
 
 # install PEM Server
