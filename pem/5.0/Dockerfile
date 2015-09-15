@@ -60,7 +60,6 @@ RUN chown -R enterprisedb:enterprisedb /var/lib/ppas
 RUN chown enterprisedb:enterprisedb /opt/backup
 
 # place all necessary files for PEM Server installation
-COPY apache_php_install_optionfile /root/apache_php_install_optionfile
 COPY pem_install_optionfile /root/pem_install_optionfile
 
 # Requires VPN connection
