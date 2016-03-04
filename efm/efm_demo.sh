@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE_NAME="efm:2"
+IMAGE_NAME="efm2:latest"
 
 if [[ ${1} == 'destroy' ]]
 then
