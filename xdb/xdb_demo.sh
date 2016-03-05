@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE_NAME="xdb5:latest"
+IMAGE_NAME="xdb5.1:latest"
 num_nodes=4
 
 if [[ ${1} == 'destroy' ]]
@@ -22,7 +22,7 @@ then
   # Create Image
 	printf "\e[0;33m==== Building new image for xDB cluster ====\n\e[0m"
   PWD=`pwd`
-  cd ${PWD}/5
+  cd ${PWD}/5.1
   docker build --no-cache -t "${IMAGE_NAME}" .
   cd ${PWD}
 fi

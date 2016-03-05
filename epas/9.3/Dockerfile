@@ -3,7 +3,7 @@ MAINTAINER richard.yen@enterprisedb.com
 
 ENV REPONAME=ppas93
 ENV PGMAJOR=9.3
-ENV PGPORT=5432
+ENV PGPORT=5444
 ENV PGDATABASE=edb
 ENV PGUSER=enterprisedb
 ENV PATH=/usr/ppas-${PGMAJOR}/bin:${PATH}
