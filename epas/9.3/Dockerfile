@@ -12,7 +12,7 @@ ENV PGLOG=/var/lib/ppas/${PGMAJOR}/pgstartup.log
 
 RUN echo "[${REPONAME}]" >> /etc/yum.repos.d/${REPONAME}.repo
 RUN echo "name=PPAS" >> /etc/yum.repos.d/${REPONAME}.repo
-RUN echo "baseurl=http://${YUMUSERNAME}:${YUMPASSWORD}@yum.enterprisedb.com/9.1/redhat/rhel-$releasever-$basearch" >> /etc/yum.repos.d/${REPONAME}.repo
+RUN echo "baseurl=http://${YUMUSERNAME}:${YUMPASSWORD}@yum.enterprisedb.com/${PGMAJOR}/redhat/rhel-\$releasever-\$basearch" >> /etc/yum.repos.d/${REPONAME}.repo
 RUN echo "enabled=1" >> /etc/yum.repos.d/${REPONAME}.repo
 RUN echo "gpgcheck=0" >> /etc/yum.repos.d/${REPONAME}.repo
 

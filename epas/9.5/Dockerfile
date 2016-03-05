@@ -1,6 +1,7 @@
 FROM centos:6.6
 MAINTAINER richard.yen@enterprisedb.com
 
+ENV REPONAME=ppas95
 ENV PGMAJOR=9.5
 ENV PGPORT=5432
 ENV PGDATABASE=edb
@@ -9,11 +10,11 @@ ENV PATH=/usr/ppas-${PGMAJOR}/bin:${PATH}
 ENV PGDATA=/var/lib/ppas/${PGMAJOR}/data
 ENV PGLOG=/var/lib/ppas/${PGMAJOR}/pgstartup.log
 
-RUN rpm -ivh http://yum.enterprisedb.com/reporpms/ppas95-repo-9.5-1.noarch.rpm
-RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/ppas95.repo
+RUN rpm -ivh http://yum.enterprisedb.com/reporpms/${REPONAME}-repo-${PGMAJOR}-1.noarch.rpm
+RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/${REPONAME}.repo
 
 RUN yum -y update
-RUN yum -y install ppas95-server.x86_64 sudo
+RUN yum -y install ${REPONAME}-server.x86_64 sudo
 
 RUN echo 'root:root'|chpasswd
 
