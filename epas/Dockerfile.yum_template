@@ -4,17 +4,27 @@ MAINTAINER richard.yen@enterprisedb.com
 ARG YUMUSERNAME
 ARG YUMPASSWORD
 
-ENV REPONAME=ppas94
-ENV PGMAJOR=9.4
-ENV PGPORT=5432
+ENV REPONAME=%%REPONAME%%
+ENV PGMAJOR=%%PGMAJOR%%
+ENV PGPORT=%%PGPORT%%
 ENV PGDATABASE=edb
 ENV PGUSER=enterprisedb
 ENV PATH=/usr/ppas-${PGMAJOR}/bin:${PATH}
 ENV PGDATA=/var/lib/ppas/${PGMAJOR}/data
 ENV PGLOG=/var/lib/ppas/${PGMAJOR}/pgstartup.log
 
-RUN rpm -ivh http://yum.enterprisedb.com/reporpms/${REPONAME}-repo-${PGMAJOR}-1.noarch.rpm
-RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/${REPONAME}.repo
+########### For PPAS 9.3 and earlier ###########
+# RUN echo "[${REPONAME}]" >> /etc/yum.repos.d/${REPONAME}.repo
+# RUN echo "name=PPAS" >> /etc/yum.repos.d/${REPONAME}.repo
+# RUN echo "baseurl=http://${YUMUSERNAME}:${YUMPASSWORD}@yum.enterprisedb.com/${PGMAJOR}/redhat/rhel-\$releasever-\$basearch" >> /etc/yum.repos.d/${REPONAME}.repo
+# RUN echo "enabled=1" >> /etc/yum.repos.d/${REPONAME}.repo
+# RUN echo "gpgcheck=0" >> /etc/yum.repos.d/${REPONAME}.repo
+################################################
+
+########### For PPAS 9.4 and later ###########
+# RUN rpm -ivh http://yum.enterprisedb.com/reporpms/${REPONAME}-repo-${PGMAJOR}-1.noarch.rpm
+# RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/${REPONAME}.repo
+##############################################
 
 RUN yum -y update
 RUN yum -y install ${REPONAME}-server.x86_64 sudo

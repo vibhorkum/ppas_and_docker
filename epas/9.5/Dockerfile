@@ -28,6 +28,8 @@ RUN echo 'postgres:postgres'|chpasswd
 
 RUN service ppas-${PGMAJOR} initdb
 
+RUN sed -i "s/^PGPORT.*/PGPORT=${PGPORT}/" /etc/sysconfig/ppas/ppas-${PGMAJOR}
+
 RUN echo "export PGPORT=${PGPORT}"         >> /etc/profile.d/pg_env.sh
 RUN echo "export PGDATABASE=${PGDATABASE}" >> /etc/profile.d/pg_env.sh
 RUN echo "export PGUSER=${PGUSER}"         >> /etc/profile.d/pg_env.sh

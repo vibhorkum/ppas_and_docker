@@ -6,7 +6,7 @@ ARG YUMPASSWORD
 
 ENV REPONAME=ppas93
 ENV PGMAJOR=9.3
-ENV PGPORT=5444
+ENV PGPORT=5432
 ENV PGDATABASE=edb
 ENV PGUSER=enterprisedb
 ENV PATH=/usr/ppas-${PGMAJOR}/bin:${PATH}
@@ -30,6 +30,8 @@ RUN echo 'postgres   ALL=(ALL)   NOPASSWD: ALL' >> /etc/sudoers
 RUN echo 'postgres:postgres'|chpasswd
 
 RUN service ppas-${PGMAJOR} initdb
+
+RUN sed -i "s/^PGPORT.*/PGPORT=${PGPORT}/" /etc/sysconfig/ppas/ppas-${PGMAJOR}
 
 RUN echo "export PGPORT=${PGPORT}"         >> /etc/profile.d/pg_env.sh
 RUN echo "export PGDATABASE=${PGDATABASE}" >> /etc/profile.d/pg_env.sh
