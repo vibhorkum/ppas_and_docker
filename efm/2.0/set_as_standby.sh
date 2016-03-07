@@ -5,7 +5,13 @@ MASTER_HOST=${1}
 ARCHIVE_DIR="/var/lib/ppas/9.4/wal_archive"
 DATADIR='/var/lib/ppas/9.4/data'
 
-# Stop existing postgres service
+# Make sure repuser exists already
+if [[ `psql -h ${MASTER_HOST} -Atc "SELECT count(*) FROM pg_shadow WHERE usename = 'repuser'" edb enterprisedb` -eq 0 ]]
+then
+  psql -h ${MASTER_HOST} edb enterprisedb -c "CREATE USER repuser REPLICATION"
+fi
+  
+# Stop existing local postgres service
 service ppas-9.4 stop
 
 # Create archive_dir for archive_command
