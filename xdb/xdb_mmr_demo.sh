@@ -15,10 +15,6 @@ fi
 
 if [[ ${1} == 'image' ]]
 then
-  # Warn user before building image--give them a chance to stop and go set the passwords
-	printf "\e[0;31mBuilding Image -- be sure to set passwords as necessary (sleeping for 10sec so you can abort)\n\e[0m"
-  sleep 10
-
   # Create Image
 	printf "\e[0;33m==== Building new image for xDB cluster ====\n\e[0m"
   PWD=`pwd`

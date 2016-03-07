@@ -13,9 +13,12 @@ RUN yum -y install --nogpgcheck -y ppas-xdb.x86_64 ppas-xdb-console.x86_64 ppas-
 # set up xDB
 COPY edb-repl.conf /etc/edb-repl.conf
 COPY xdb_repsvrfile.conf /usr/ppas-xdb-5.1/etc/xdb_repsvrfile.conf
+COPY xdb_repsvrfile.conf /usr/ppas-xdb-5.1/etc/xdb_subsvrfile.conf
+RUN sed -i "s/9051/9052/" /usr/ppas-xdb-5.1/etc/xdb_subsvrfile.conf
+
 COPY build_xdb_smr_publication.sh /usr/ppas-xdb-5.1/bin/build_xdb_smr_publication.sh
 COPY build_xdb_mmr_publication.sh /usr/ppas-xdb-5.1/bin/build_xdb_mmr_publication.sh
 
-EXPOSE 9051
+EXPOSE 9051 9052
 
 CMD service ppas-9.5 start && tail -F /var/log/messages

@@ -1,24 +1,21 @@
 FROM centos:6.6
 MAINTAINER richard.yen@enterprisedb.com
 
-ARG YUMUSERNAME
-ARG YUMPASSWORD
 ARG INSTALLER_FILENAME
 
-ENV REPONAME=%%REPONAME%%
 ENV PGMAJOR=%%PGMAJOR%%
-ENV PGPORT=%%PGPORT%%
+ENV PGPORT=5432
 ENV PGDATABASE=edb
 ENV PGUSER=enterprisedb
-ENV PATH=/usr/ppas-${PGMAJOR}/bin:${PATH}
-ENV PGDATA=/var/lib/ppas/${PGMAJOR}/data
-ENV PGLOG=/var/lib/ppas/${PGMAJOR}/pgstartup.log
+ENV PATH=/opt/PostgresPlus/${PGMAJOR}AS/bin:${PATH}
+ENV PGDATA=/opt/PostgresPlus/${PGMAJOR}AS/data
+ENV PGLOG=/opt/PostgresPlus/${PGMAJOR}AS/pgstartup.log
 
 RUN yum -y update
 
 COPY ${INSTALLER_FILENAME} /tmp/${INSTALLER_FILENAME}
-RUN chmod 744 /tmp/${INSTALLER_FILENAME}
-RUN /tmp/${INSTALLER_FILENAME}
+RUN chmod 755 /tmp/${INSTALLER_FILENAME}
+RUN /tmp/${INSTALLER_FILENAME} --mode unattended
 
 RUN echo 'root:root'|chpasswd
 
@@ -26,10 +23,6 @@ RUN echo 'root:root'|chpasswd
 RUN adduser --home-dir /home/postgres --create-home postgres
 RUN echo 'postgres   ALL=(ALL)   NOPASSWD: ALL' >> /etc/sudoers
 RUN echo 'postgres:postgres'|chpasswd
-
-RUN service ppas-${PGMAJOR} initdb
-
-RUN sed -i "s/^PGPORT.*/PGPORT=${PGPORT}/" /etc/sysconfig/ppas/ppas-${PGMAJOR}
 
 RUN echo "export PGPORT=${PGPORT}"         >> /etc/profile.d/pg_env.sh
 RUN echo "export PGDATABASE=${PGDATABASE}" >> /etc/profile.d/pg_env.sh
@@ -46,4 +39,4 @@ RUN sed -i "s/^#wal_level.*/wal_level=hot_standby/" ${PGDATA}/postgresql.conf
 
 EXPOSE ${PGPORT}
 
-CMD service ppas-${PGMAJOR} start && tail -F ${PGLOG}
+CMD service ppas-${PGMAJOR} restart && tail -F ${PGLOG}
