@@ -1,20 +1,25 @@
 #!/bin/bash
 
-# install sslutils
-cd /root/sslutils-1.1
-make USE_PGXS=1 
-make USE_PGXS=1 install
+PEM_SERVER_INSTALL=`ls /root | grep pem_server-.*-linux-x64.run`
+
+# setting temporary password
+psql edb enterprisedb -c "ALTER USER enterprisedb WITH PASSWORD 'abc123'" &> /dev/null
 
 # create placeholder dirs
+printf "\e[0;33m==== Extracting dependencies for PEM Server ====\n\e[0m"
 mkdir -p /opt/apache-php
 mkdir -p /opt/php_edbpem
 
 # extract Apache/PHP package
-/root/pem_server-5.0.0-2-linux-x64.run --extract-php_edbpem /opt/php_edbpem --extract-apache-php /opt/apache-php
+/root/${PEM_SERVER_INSTALL} --extract-php_edbpem /opt/php_edbpem --extract-apache-php /opt/apache-php
 
 # install Apache/PHP
-/opt/apache-php/apachephp-2.4.10-5.5.19-1-linux-x64.run --mode unattended --optionfile /root/apache_php_install_optionfile
-/opt/php_edbpem/php_edbpem-5.5.19-5.0.0-2-linux-x64.run --mode unattended
+printf "\e[0;33m==== Installing Apache/PHP for Web-based PEM Console ====\n\e[0m"
+APACHEPHP_INSTALL=`ls /opt/apache-php | grep apachephp-.*-linux-x64.run`
+PHP_EDBPEM_INSTALL=`ls /opt/php_edbpem | grep php_edbpem-.*-linux-x64.run`
+/opt/apache-php/${APACHEPHP_INSTALL} --mode unattended --prefix /usr/edb-apache-php
+/opt/php_edbpem/${PHP_EDBPEM_INSTALL} --mode unattended
 
 # install PEM Server
-/root/pem_server-5.0.0-2-linux-x64.run --mode unattended --optionfile /root/pem_install_optionfile
+printf "\e[0;33m==== Installing PEM Server ====\n\e[0m"
+/root/${PEM_SERVER_INSTALL} --mode unattended --optionfile /root/pem_install_optionfile

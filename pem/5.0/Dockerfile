@@ -60,12 +60,11 @@ RUN chown -R enterprisedb:enterprisedb /var/lib/ppas
 RUN chown enterprisedb:enterprisedb /opt/backup
 
 # place all necessary files for PEM Server installation
-COPY apache_php_install_optionfile /root/apache_php_install_optionfile
 COPY pem_install_optionfile /root/pem_install_optionfile
 
 # Requires VPN connection
-RUN wget -q --user=<user> --password=<password> --directory-prefix=/root/ https://builds.enterprisedb.com/builds/Releases/PEM/v5.0.0/GA/server/pem_server-5.0.0-2-linux-x64.run
-RUN chmod 755 /root/pem_server-5.0.0-2-linux-x64.run
+RUN wget -q --directory-prefix=/root/ http://get.enterprisedb.com/pem/pem_server-5.0.2-2-linux-x64.run
+RUN chmod 755 /root/pem_server-5.0.2-2-linux-x64.run
 
 # allow user to decide which/where to install PEM server/agent
 COPY install_pem_server.sh /root/install_pem_server.sh
