@@ -10,6 +10,8 @@ RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.rep
 # run update and install require packages.
 RUN yum install -y which efm20 java-1.6.0-openjdk
 
+RUN sed -i "s/^#wal_keep_segments = 0/wal_keep_segments = 500/" /var/lib/ppas/9.4/data/postgresql.conf
+RUN sed -i "s/^#max_wal_senders = 0/max_wal_senders = 5/" /var/lib/ppas/9.4/data/postgresql.conf
 RUN mkdir -p /opt/backup
 RUN mkdir -p /var/lib/ppas/9.4/wal_archive
 RUN chown -R enterprisedb:enterprisedb /var/lib/ppas
@@ -20,9 +22,9 @@ COPY set_as_master.sh /usr/efm-2.0/bin/set_as_master.sh
 COPY set_as_witness.sh /usr/efm-2.0/bin/set_as_witness.sh
 COPY set_as_standby.sh /usr/efm-2.0/bin/set_as_standby.sh
 COPY efm.properties /etc/efm-2.0/efm.properties
-#RUN cp /etc/efm-2.0/efm.nodes.in /etc/efm-2.0/efm.nodes
+RUN cp /etc/efm-2.0/efm.nodes.in /etc/efm-2.0/efm.nodes
 
 # expose ports.
 EXPOSE 5431 5430
 
-CMD service ppas-9.4 start && tail -F /var/log/messages
+CMD service ppas-9.4 restart && tail -F /var/log/messages

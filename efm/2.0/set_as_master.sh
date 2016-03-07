@@ -1,6 +1,6 @@
 #!/bin/bash
 
-service ppas-9.4 start
+service ppas-9.4 restart
 
 psql edb enterprisedb -c "create user repuser replication"
 
