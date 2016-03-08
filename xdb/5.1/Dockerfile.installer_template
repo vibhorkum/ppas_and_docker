@@ -1,0 +1,34 @@
+FROM ppas95:latest
+MAINTAINER richard.yen@enterprisedb.com
+
+ARG INSTALLER_FILENAME
+ARG EDBUSERNAME
+ARG EDBPASSWORD
+
+ENV PGMAJOR=9.5
+ENV XDB_VERSION=5.1
+ENV INSTALLDIR=/usr/ppas-xdb-${XDB_VERSION}
+ENV JAVA_VERSION=1.6
+
+# install required packages.
+RUN yum -y install java-${JAVA_VERSION}.0-openjdk-devel
+
+RUN touch /etc/postgres-reg.ini
+COPY ${INSTALLER_FILENAME} /tmp/${INSTALLER_FILENAME}
+RUN chmod 755 /tmp/${INSTALLER_FILENAME}
+
+COPY do_xdb_install.sh /tmp/do_xdb_install.sh
+RUN /tmp/do_xdb_install.sh ${INSTALLER_FILENAME} ${EDBUSERNAME} ${EDBPASSWORD} ${INSTALLDIR} ${PGMAJOR}
+
+# set up xDB
+COPY edb-repl.conf /etc/edb-repl.conf
+COPY xdb_repsvrfile.conf ${INSTALLDIR}/etc/xdb_repsvrfile.conf
+COPY xdb_repsvrfile.conf ${INSTALLDIR}/etc/xdb_subsvrfile.conf
+RUN sed -i "s/9051/9052/" ${INSTALLDIR}/etc/xdb_subsvrfile.conf
+
+COPY build_xdb_smr_publication.sh ${INSTALLDIR}/bin/build_xdb_smr_publication.sh
+COPY build_xdb_mmr_publication.sh ${INSTALLDIR}/bin/build_xdb_mmr_publication.sh
+
+EXPOSE 9051 9052
+
+CMD service ppas-${PGMAJOR} start && tail -F /var/log/messages

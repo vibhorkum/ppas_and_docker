@@ -1,6 +1,7 @@
 #!/bin/bash
 
-service ppas-9.4 start
+# Make sure Postgres is running
+service ppas-9.4 restart
 
 psql edb enterprisedb -c "create user repuser replication"
 
