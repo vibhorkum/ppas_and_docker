@@ -1,17 +1,24 @@
 FROM ppas95:latest
 MAINTAINER richard.yen@enterprisedb.com
 
-ARG YUMUSERNAME
-ARG YUMPASSWORD
+ARG INSTALLER_FILENAME
+ARG EDBUSERNAME
+ARG EDBPASSWORD
 
 ENV PGMAJOR=9.5
-ENV INSTALLDIR=/usr/ppas-xdb-5.1
-
-RUN rpm -ivh http://yum.enterprisedb.com/reporpms/enterprisedb-tools-repo-1.0-1.noarch.rpm
-RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/enterprisedb-tools.repo
+ENV XDB_VERSION=5.1
+ENV INSTALLDIR=/usr/ppas-xdb-${XDB_VERSION}
+ENV JAVA_VERSION=1.6
 
 # install required packages.
-RUN yum -y install ppas-xdb ppas-xdb-console ppas-xdb-libs ppas-xdb-publisher which
+RUN yum -y install java-${JAVA_VERSION}.0-openjdk-devel
+
+RUN touch /etc/postgres-reg.ini
+COPY ${INSTALLER_FILENAME} /tmp/${INSTALLER_FILENAME}
+RUN chmod 755 /tmp/${INSTALLER_FILENAME}
+
+COPY do_xdb_install.sh /tmp/do_xdb_install.sh
+RUN /tmp/do_xdb_install.sh ${INSTALLER_FILENAME} ${EDBUSERNAME} ${EDBPASSWORD} ${INSTALLDIR} ${PGMAJOR}
 
 # set up xDB
 COPY edb-repl.conf /etc/edb-repl.conf
