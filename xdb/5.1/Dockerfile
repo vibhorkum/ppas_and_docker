@@ -7,8 +7,8 @@ ARG YUMPASSWORD
 RUN rpm -ivh http://yum.enterprisedb.com/reporpms/enterprisedb-tools-repo-1.0-1.noarch.rpm
 RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/enterprisedb-tools.repo
 
-# run update and install require packages.
-RUN yum -y install --nogpgcheck -y ppas-xdb.x86_64 ppas-xdb-console.x86_64 ppas-xdb-libs.x86_64 ppas-xdb-publisher.x86_64 which
+# install required packages.
+RUN yum -y install ppas-xdb ppas-xdb-console ppas-xdb-libs ppas-xdb-publisher which
 
 # set up xDB
 COPY edb-repl.conf /etc/edb-repl.conf

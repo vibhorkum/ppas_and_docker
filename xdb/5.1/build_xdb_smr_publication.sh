@@ -6,7 +6,7 @@ PUB_IP=`hostname -i`
 SUB_IP=$1
 
 # Create xDB Control Database
-createdb xdb_pub
+createdb xdb_ctl
 
 # Start publication and subscription servers
 service edb-xdbpubserver start

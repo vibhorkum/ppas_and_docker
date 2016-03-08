@@ -7,7 +7,7 @@ export MDN_IP=`hostname -i`
 export OTHER_MASTER_IPS=''
 
 # Start xDB
-createdb -h ${PUBSVR_IP} xdb_pub
+createdb -h ${PUBSVR_IP} xdb_ctl
 service edb-xdbpubserver start
 
 # Load data into MDN
