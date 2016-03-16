@@ -5,4 +5,4 @@ pghost=127.0.0.1
 pgport=5432
 pguser=enterprisedb
 pgpassword=abc123
-servicename=ppas-9.4
+servicename=ppas-9.5
