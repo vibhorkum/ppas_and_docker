@@ -1,20 +1,17 @@
 #!/bin/bash
 
 PEM_SERVER_IP=${1}
+
+if [ "x${PEM_SERVER_IP}" == "x" ]
+then
+  echo "USAGE: ${0} <pem_server_ip>"
+fi
+
 CONTAINER_NAME=`hostname`
 AGENT_ID=`hostname -i | cut -f4 -d '.'`
 
-# install agent
-yum -y install pem-agent
+/tmp/`ls /tmp/ | grep agent | grep run` --mode unattended --pghost ${PEM_SERVER_IP} --pguser enterprisedb --pgpassword abc123 --agent_description ${CONTAINER_NAME} --prefix /usr/pem-5.0
 
-# create config file
-cp /usr/pem-5.0/etc/agent.cfg.sample /usr/pem-5.0/etc/agent.cfg
-sed -i "s/pem_host=.*/pem_host=${PEM_SERVER_IP}/" /usr/pem-5.0/etc/agent.cfg
-sed -i "s/pem_port=.*/pem_port=5432/" /usr/pem-5.0/etc/agent.cfg
-sed -i "s/agent_id=.*/agent_id=${AGENT_ID}/" /usr/pem-5.0/etc/agent.cfg
+find /usr/pem-5.0/agent/lib -type f | xargs -I% ln -s % /lib64/
 
-#register agent
-/usr/pem-5.0/bin/pemagent --register-agent --pem-server ${PEM_SERVER_IP} --pem-user enterprisedb --display-name ${CONTAINER_NAME}
-
-# start agent
 service pemagent start

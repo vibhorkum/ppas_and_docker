@@ -1,20 +1,21 @@
 FROM ppas95:latest
 MAINTAINER richard.yen@enterprisedb.com
 
-ARG YUMUSERNAME
-ARG YUMPASSWORD
+ARG INSTALLER_FILENAME
 
-RUN rpm -ivh http://yum.enterprisedb.com/reporpms/enterprisedb-tools-repo-1.0-1.noarch.rpm
-RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/enterprisedb-tools.repo
+ENV PGDATA=/var/lib/ppas/9.5/data
 
-# run update and install require packages.
-RUN yum -y install which ppas95-server-sslutils openssl-devel pem-agent
+# Put SSL certs in place
+COPY server.crt ${PGDATA}/
+COPY server.key ${PGDATA}/
+COPY server.req ${PGDATA}/
+RUN chown enterprisedb:enterprisedb ${PGDATA}/*
 
-RUN cp /usr/pem-6.0/etc/agent.cfg.sample /usr/pem-6.0/etc/agent.cfg
-RUN sed -i "s/pem_host=.*/pem_host=%%PEM_SERVER_IP%%/" /usr/pem-6.0/etc/agent.cfg
-RUN sed -i "s/pem_port=.*/pem_port=5432/" /usr/pem-6.0/etc/agent.cfg
-RUN sed -i "s/agent_id=.*/agent_id=%%AGENT_ID%%/" /usr/pem-6.0/etc/agent.cfg
+RUN sed -i "s/^#ssl/ssl/" ${PGDATA}/postgresql.conf
+RUN echo "host all all ::1/0 trust" >> ${PGDATA}/pg_hba.conf
 
-# Create script to register agent
-RUN echo "/usr/pem-6.0/bin/pemagent --register-agent --pem-server %%PEM_SERVER_IP%% --pem-user enterprisedb --display-name %%AGENT_NAME%%" >> /tmp/register_pem_agent.sh
-RUN chmod 755 /tmp/register_pem_agent.sh
+COPY ${INSTALLER_FILENAME} /tmp
+RUN chmod 755 /tmp/${INSTALLER_FILENAME}
+COPY install_pem_agent.sh /tmp
+
+RUN service ppas-9.5 restart
