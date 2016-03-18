@@ -18,4 +18,4 @@ COPY ${INSTALLER_FILENAME} /tmp
 RUN chmod 755 /tmp/${INSTALLER_FILENAME}
 COPY install_pem_agent.sh /tmp
 
-RUN service ppas-9.5 restart
+RUN service ppas-9.5 restart &> /dev/null
