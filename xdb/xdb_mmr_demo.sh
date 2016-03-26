@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# IMAGE_NAME="xdb51:latest"
-# XDB_VERSION="5.1"
-IMAGE_NAME="xdb6:6.0.0"
-XDB_VERSION="6.0"
+IMAGE_NAME="xdb51:latest"
+XDB_VERSION="5.1"
 num_nodes=4
 
 if [[ ${1} == 'destroy' ]]

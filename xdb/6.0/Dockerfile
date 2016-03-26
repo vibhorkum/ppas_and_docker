@@ -25,6 +25,8 @@ RUN chmod 755 /tmp/${INSTALLER_FILENAME}
 # install and set up xDB
 RUN /tmp/${INSTALLER_FILENAME} --existing-user ${EDBUSERNAME} --existing-password ${EDBPASSWORD} --mode unattended --admin_user enterprisedb --admin_password abc123 --prefix ${INSTALLDIR} --disable-components subserver
 COPY xdb_repsvrfile.conf ${INSTALLDIR}/etc/xdb_repsvrfile.conf
+
+# fill in placeholders
 COPY build_xdb_mmr_publication.sh ${INSTALLDIR}/bin/build_xdb_mmr_publication.sh
 RUN sed -i "s/xdbinstalldir_placeholder/\/usr\/ppas-xdb-${XDB_VERSION}/g" ${INSTALLDIR}/bin/build_xdb_mmr_publication.sh
 RUN sed -i "s/xdbdbport_placeholder/${PGPORT}/g" ${INSTALLDIR}/bin/build_xdb_mmr_publication.sh
