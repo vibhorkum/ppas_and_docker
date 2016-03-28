@@ -1,4 +1,4 @@
-Simple Docker image for EnterpriseDB Backup and Recovery Tool 1.1 on PostgresPlus Advanced Server 9.4
+Simple Docker image for EnterpriseDB Backup and Recovery Tool 1.1 on EDB Postgres Advanced Server (EPAS)
 
 1. Build image with `docker build --build-arg YUMUSERNAME=${YUMUSERNAME} --build-arg YUMPASSWORD=${YUMPASSWORD} -t "my:tag" .`
 1. Create container with `docker run --privileged=true  --interactive=false -dtP --name="my_container_name" "my:tag"`
