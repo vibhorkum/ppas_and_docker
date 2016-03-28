@@ -9,7 +9,6 @@ export EDBPASSWORD="abc123"
 export YUMUSERNAME="my-yum-username"
 export YUMPASSWORD="1234567890abcdef1234567890"
 ```
-
 * Once you get your login/password, you can build images based off EDB products:
   * `cd epas/9.5`
   * `docker build --build-arg YUMUSERNAME=${YUMUSERNAME} --build-arg YUMPASSWORD=${YUMPASSWORD} -t epas95:latest .`
