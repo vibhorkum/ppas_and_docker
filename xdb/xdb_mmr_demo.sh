@@ -1,6 +1,7 @@
 #!/bin/bash
 
 IMAGE_NAME="xdb51:latest"
+XDB_VERSION="5.1"
 num_nodes=4
 
 if [[ ${1} == 'destroy' ]]
@@ -18,8 +19,8 @@ then
   # Create Image
 	printf "\e[0;33m==== Building new image for xDB cluster ====\n\e[0m"
   PWD=`pwd`
-  cd ${PWD}/5.1
-  docker build --no-cache -t "${IMAGE_NAME}" .
+  cd ${PWD}/${XDB_VERSION}
+  docker build --no-cache --build-arg EDBUSERNAME=${EDBUSERNAME} --build-arg EDBPASSWORD=${EDBPASSWORD} --build-arg INSTALLER_FILENAME=${INSTALLER_FILENAME} -t ${IMAGE_NAME} .
   cd ${PWD}
 fi
 
@@ -39,10 +40,10 @@ done
 
 printf "\e[0;33m>>> SETTING UP MASTER DATABASE\n\e[0m"
 # Load tables/data
-docker exec -t xdb1 sed -i "s/^export OTHER_MASTER_IPS.*/export OTHER_MASTER_IPS='${OTHER_MASTER_IPS}'/" /usr/ppas-xdb-5.1/bin/build_xdb_mmr_publication.sh
+docker exec -t xdb1 sed -i "s/^export OTHER_MASTER_IPS.*/export OTHER_MASTER_IPS='${OTHER_MASTER_IPS}'/" /usr/ppas-xdb-${XDB_VERSION}/bin/build_xdb_mmr_publication.sh
 
 printf "\e[0;33m>>> SETTING UP REPLICATION\n\e[0m"
-docker exec -t xdb1 bash --login -c "/usr/ppas-xdb-5.1/bin/build_xdb_mmr_publication.sh"
+docker exec -t xdb1 bash --login -c "/usr/ppas-xdb-${XDB_VERSION}/bin/build_xdb_mmr_publication.sh"
 
 printf "\e[0;33m>>> DONE, VERIFYING REPLICATION\n\e[0m"
 # Verify replication works
@@ -59,4 +60,4 @@ done
 
 printf "\e[0;33m>>> xDB Status\n\e[0m"
 # Check uptime
-docker exec -it xdb1 java -jar /usr/ppas-xdb-5.1/bin/edb-repcli.jar -repsvrfile /usr/ppas-xdb-5.1/etc/xdb_repsvrfile.conf -uptime
+docker exec -it xdb1 java -jar /usr/ppas-xdb-${XDB_VERSION}/bin/edb-repcli.jar -repsvrfile /usr/ppas-xdb-${XDB_VERSION}/etc/xdb_repsvrfile.conf -uptime
