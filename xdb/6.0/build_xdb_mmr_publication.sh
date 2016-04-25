@@ -11,7 +11,7 @@ rm -f /var/run/edb-xdbpubserver/edb-xdbpubserver.pid
 service edb-xdbpubserver start
 
 # Load data into MDN
-pgbench -h ${MDN_IP} -i -F 10 -s 10 edb
+pgbench -h ${MDN_IP} -i edb
 # psql -h ${MDN_IP} -c "ALTER TABLE pgbench_history add primary key (tid,bid,aid,delta,mtime)" edb
 
 # Build xDB replication infrastructure
