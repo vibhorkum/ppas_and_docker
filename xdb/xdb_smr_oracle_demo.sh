@@ -12,7 +12,7 @@ fi
 
 printf "\e[0;33m==== Building containers for xDB cluster ====\n\e[0m"
 O_NAME="xdb_oracle"
-docker run --privileged=true --publish-all=true --interactive=false --tty=true -v ${PWD}:/xdb_demo -v /Users/${USER}/Desktop:/Desktop --hostname=xdb_oracle --detach=true --name=xdb_oracle wnameless/oracle-xe-11g:latest
+docker run --privileged=true --publish-all=true --interactive=false --tty=true -v ${PWD}:/xdb_demo -v /Users/${USER}/Desktop:/Desktop --hostname=${O_NAME} --detach=true --name=${O_NAME} wnameless/oracle-xe-11g:latest
 ORA_IP=`docker exec -it ${O_NAME} ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
 docker exec -t ${O_NAME} bash --login -c "echo 'export ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe' >> ~/.profile"
 docker exec -t ${O_NAME} bash --login -c "echo 'export PATH=\$ORACLE_HOME/bin:\$PATH' >> ~/.profile"
@@ -31,6 +31,10 @@ printf "\e[0;33m==== Preparing data and services ====\n\e[0m"
 docker exec -t ${O_NAME} bash --login -c "sleep 30" # Make sure Oracle server has actually spun up within the container, if it hasn't already
 docker exec -t ${O_NAME} bash --login -c "sqlplus -S system/oracle < /xdb_demo/oracle_files/load_oracle_test_data.sql"
 
+if [[ ${XDB_VERSION} == '5.1' ]]
+then
+  docker exec -t ${P_NAME} bash --login -c "createdb xdb_ctl"
+fi
 docker exec -t ${P_NAME} bash --login -c "cp /xdb_demo/oracle_files/ojdbc6.jar ${XDB_PATH}/lib/jdbc/ojdbc6.jar"
 docker exec -t ${P_NAME} bash --login -c "/etc/init.d/edb-xdbpubserver start"
 docker exec -t ${P_NAME} bash --login -c "/etc/init.d/edb-xdbsubserver start"
