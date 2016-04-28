@@ -1,43 +1,47 @@
 #!/bin/bash
 
-#### NOTE: This is designed only to work with XDB 6.0 and later.
-#### This has not been tested for XDB 5.1.x
+IMAGE_NAME="xdb51:latest"
+XDB_VERSION="5.1"
+
+O_NAME="xdb_oracle"
+P_NAME="xdb_postgres"
 
 if [[ ${1} == 'destroy' ]]
 then
 	printf "\e[0;31m==== Destroying existing xDB cluster ====\n\e[0m"
-  docker rm -f xdb_{oracle,postgres}
+  docker rm -f ${O_NAME} ${P_NAME}
   exit 0
+elif [[ ${1} == '6' ]]
+then
+  IMAGE_NAME="xdb6:latest"
+  XDB_VERSION="6.0"
 fi
 
 printf "\e[0;33m==== Building containers for xDB cluster ====\n\e[0m"
-O_NAME="xdb_oracle"
 docker run --privileged=true --publish-all=true --interactive=false --tty=true -v ${PWD}:/xdb_demo -v /Users/${USER}/Desktop:/Desktop --hostname=${O_NAME} --detach=true --name=${O_NAME} wnameless/oracle-xe-11g:latest
 ORA_IP=`docker exec -it ${O_NAME} ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
-docker exec -t ${O_NAME} bash --login -c "echo 'export ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe' >> ~/.profile"
-docker exec -t ${O_NAME} bash --login -c "echo 'export PATH=\$ORACLE_HOME/bin:\$PATH' >> ~/.profile"
-docker exec -t ${O_NAME} bash --login -c "echo 'export ORACLE_SID=XE' >> ~/.profile"
+docker exec -t ${O_NAME} bash --login -c "echo 'export ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe' >> /etc/profile"
+docker exec -t ${O_NAME} bash --login -c "echo 'export PATH=\$ORACLE_HOME/bin:\$PATH' >> /etc/profile"
+docker exec -t ${O_NAME} bash --login -c "echo 'export ORACLE_SID=XE' >> /etc/profile"
 printf "\e[0;33m${O_NAME} => ${ORA_IP}\n\e[0m"
 
-IMAGE_NAME="xdb6:latest"
-XDB_VERSION="6.0"
-XDB_PATH="/usr/ppas-xdb-${XDB_VERSION}"
-P_NAME="xdb_postgres"
 docker run --privileged=true --publish-all=true --interactive=false --tty=true -v ${PWD}:/xdb_demo -v /Users/${USER}/Desktop:/Desktop --hostname=${P_NAME} --detach=true --name=${P_NAME} ${IMAGE_NAME}
 PG_IP=`docker exec -it ${P_NAME} ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
 printf "\e[0;33m${P_NAME} => ${PG_IP}\n\e[0m"
 
 printf "\e[0;33m==== Preparing data and services ====\n\e[0m"
 docker exec -t ${O_NAME} bash --login -c "sleep 30" # Make sure Oracle server has actually spun up within the container, if it hasn't already
-docker exec -t ${O_NAME} bash --login -c "sqlplus -S system/oracle < /xdb_demo/oracle_files/load_oracle_test_data.sql"
-
 if [[ ${XDB_VERSION} == '5.1' ]]
 then
+  docker exec -t ${O_NAME} bash --login -c "sqlplus -S system/oracle < /xdb_demo/oracle_files/remove_repcat.sql" # Clean out REPCAT data that got included with the container; not compatible with Postgres
   docker exec -t ${P_NAME} bash --login -c "createdb xdb_ctl"
 fi
+
+XDB_PATH="/usr/ppas-xdb-${XDB_VERSION}"
 docker exec -t ${P_NAME} bash --login -c "cp /xdb_demo/oracle_files/ojdbc6.jar ${XDB_PATH}/lib/jdbc/ojdbc6.jar"
 docker exec -t ${P_NAME} bash --login -c "/etc/init.d/edb-xdbpubserver start"
 docker exec -t ${P_NAME} bash --login -c "/etc/init.d/edb-xdbsubserver start"
+docker exec -t ${O_NAME} bash --login -c "sqlplus -S system/oracle < /xdb_demo/oracle_files/load_oracle_test_data.sql"
 
 ENCRYPTED_ORA_PASS="deIuKoLKPi4=" # Plaintext password is "oracle"
 
