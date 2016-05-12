@@ -3,7 +3,7 @@ Simple Docker image for EnterpriseDB Failover Manager 2.0 on EDB Postgres Advanc
 ###Getting Started
 1. Update repos with a valid EDB YUM repo login/password
 1. Build image with `docker build --build-arg YUMUSERNAME=${YUMUSERNAME} --build-arg YUMPASSWORD=${YUMPASSWORD} -t "my:tag" .`
-1. Create container with `docker run --privileged=true  --interactive=false -dtP --name="my_container_name" "my:tag"`
+1. Create 3 containers with `docker run --privileged=true  --interactive=false -dtP --name="<my_container_name>" "my:tag"`
 
 ###Setting up EFM Master node
 1. SSH into the master node container `docker exec -it my_container_name "/bin/bash"`
