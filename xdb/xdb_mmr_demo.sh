@@ -7,7 +7,7 @@ num_nodes=4
 if [[ ${1} == 'destroy' ]]
 then
 	printf "\e[0;31m==== Destroying existing xDB cluster ====\n\e[0m"
-  for ((i=1;i<${num_nodes};i++))
+  for ((i=1;i<=${num_nodes};i++))
   do
     docker rm -f xdb${i}
   done
@@ -26,7 +26,7 @@ fi
 
 OTHER_MASTER_IPS=''
 printf "\e[0;33m==== Building containers for xDB cluster ====\n\e[0m"
-for ((i=1;i<${num_nodes};i++))
+for ((i=1;i<=${num_nodes};i++))
 do
   C_NAME="xdb${i}"
   docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} ${IMAGE_NAME}
@@ -47,13 +47,13 @@ docker exec -t xdb1 bash --login -c "/usr/ppas-xdb-${XDB_VERSION}/bin/build_xdb_
 
 printf "\e[0;33m>>> DONE, VERIFYING REPLICATION\n\e[0m"
 # Verify replication works
-for ((i=2;i<${num_nodes};i++))
+for ((i=2;i<=${num_nodes};i++))
 do
   docker exec -it xdb${i} bash --login -c "psql -c \"SELECT * FROM pgbench_accounts WHERE aid = 1\" edb"
 done
 docker exec -t xdb1 bash --login -c "psql -c \"UPDATE pgbench_accounts SET filler=md5(random()::text) WHERE aid = 1\" edb"
 sleep 10
-for ((i=2;i<${num_nodes};i++))
+for ((i=2;i<=${num_nodes};i++))
 do
   docker exec -it xdb${i} bash --login -c "psql -c \"SELECT * FROM pgbench_accounts WHERE aid = 1\" edb"
 done
