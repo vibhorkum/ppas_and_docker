@@ -26,15 +26,22 @@ fi
 
 OTHER_MASTER_IPS=''
 printf "\e[0;33m==== Building containers for xDB cluster ====\n\e[0m"
-for ((i=1;i<=${num_nodes};i++))
+C_NAME="xdb1"
+docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} ${IMAGE_NAME}
+for ((i=2;i<=${num_nodes};i++))
 do
   C_NAME="xdb${i}"
-  docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} ${IMAGE_NAME}
+  docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} ppas95:latest
   IP=`docker exec -it ${C_NAME} ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
   printf "\e[0;33m${C_NAME} => ${IP}\n\e[0m"
-  if [[ ${i} -gt 1 ]]
+  OTHER_MASTER_IPS="${OTHER_MASTER_IPS} ${IP}"
+  if [[ ${XDB_VERSION} == '6.0' ]]
   then
-    OTHER_MASTER_IPS="${OTHER_MASTER_IPS} ${IP}"
+    PGMAJOR=9.5
+    docker exec -t xdb${i} sed -i "s/^wal_level.*/wal_level = logical/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
+    docker exec -t xdb${i} sed -i "s/^#max_replication_slots.*/max_replication_slots = 5/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
+    docker exec -t xdb${i} sh -c "echo \"host replication enterprisedb 0.0.0.0/0 trust\" >> /var/lib/ppas/${PGMAJOR}/data/pg_hba.conf"
+    docker exec -t xdb${i} service ppas-9.5 restart
   fi
 done
 
