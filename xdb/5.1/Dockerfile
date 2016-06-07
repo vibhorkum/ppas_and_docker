@@ -6,12 +6,14 @@ ARG YUMPASSWORD
 
 ENV XDB_VERSION=5.1
 ENV INSTALLDIR=/usr/ppas-xdb-${XDB_VERSION}
+ENV JAVA_VERSION=1.7
 
+# install required packages.
 RUN rpm -ivh http://yum.enterprisedb.com/reporpms/enterprisedb-tools-repo-1.0-1.noarch.rpm
 RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/enterprisedb-tools.repo
 
 # install required packages.
-RUN yum -y install ppas-xdb ppas-xdb-console ppas-xdb-libs ppas-xdb-publisher which
+RUN yum -y install ppas-xdb ppas-xdb-console ppas-xdb-libs ppas-xdb-publisher which java-${JAVA_VERSION}.0-openjdk-devel
 
 # set up xDB
 COPY edb-repl.conf /etc/edb-repl.conf
