@@ -1,36 +1,39 @@
 #!/bin/bash
 
-IMAGE_NAME="xdb51:latest"
-XDB_VERSION="5.1"
-num_nodes=4
-
-if [[ ${1} == 'destroy' ]]
+if [[ "x${1}" == "x" ]]
 then
-	printf "\e[0;31m==== Destroying existing xDB cluster ====\n\e[0m"
+  echo "USAGE: ${0} <xdb_version> [destroy]"
+  exit 1
+fi
+
+C_SUFFIX=${1}
+if [[ ${C_SUFFIX} -eq 6 ]]
+then
+  XDB_VERSION="6.0"
+  IMAGE_NAME="xdb6:latest"
+else
+  XDB_VERSION="5.1"
+  IMAGE_NAME="xdb51:latest"
+fi
+
+num_nodes=4
+if [[ ${2} == 'destroy' ]]
+then
+  printf "\e[0;31m==== Destroying existing xDB cluster ====\n\e[0m"
   for ((i=1;i<=${num_nodes};i++))
   do
-    docker rm -f xdb${i}
+    docker rm -f xdb${C_SUFFIX}-${i}
   done
   exit 0
 fi
 
-if [[ ${1} == 'image' ]]
-then
-  # Create Image
-	printf "\e[0;33m==== Building new image for xDB cluster ====\n\e[0m"
-  PWD=`pwd`
-  cd ${PWD}/${XDB_VERSION}
-  docker build --no-cache --build-arg EDBUSERNAME=${EDBUSERNAME} --build-arg EDBPASSWORD=${EDBPASSWORD} --build-arg INSTALLER_FILENAME=${INSTALLER_FILENAME} -t ${IMAGE_NAME} .
-  cd ${PWD}
-fi
-
 OTHER_MASTER_IPS=''
 printf "\e[0;33m==== Building containers for xDB cluster ====\n\e[0m"
-C_NAME="xdb1"
+C_NAME="xdb${C_SUFFIX}-1"
 docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} ${IMAGE_NAME}
 for ((i=2;i<=${num_nodes};i++))
 do
-  C_NAME="xdb${i}"
+  C_NAME="xdb${C_SUFFIX}-${i}"
   docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} ppas95:latest
   IP=`docker exec -it ${C_NAME} ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
   printf "\e[0;33m${C_NAME} => ${IP}\n\e[0m"
@@ -38,34 +41,34 @@ do
   if [[ ${XDB_VERSION} == '6.0' ]]
   then
     PGMAJOR=9.5
-    docker exec -t xdb${i} sed -i "s/^wal_level.*/wal_level = logical/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
-    docker exec -t xdb${i} sed -i "s/^#max_replication_slots.*/max_replication_slots = 5/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
-    docker exec -t xdb${i} sed -i "s/^#track_commit_timestamp.*/track_commit_timestamp = on/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
-    docker exec -t xdb${i} sh -c "echo \"host replication enterprisedb 0.0.0.0/0 trust\" >> /var/lib/ppas/${PGMAJOR}/data/pg_hba.conf"
-    docker exec -t xdb${i} service ppas-9.5 restart
+    docker exec -t xdb${C_SUFFIX}-${i} sed -i "s/^wal_level.*/wal_level = logical/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
+    docker exec -t xdb${C_SUFFIX}-${i} sed -i "s/^#max_replication_slots.*/max_replication_slots = 5/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
+    docker exec -t xdb${C_SUFFIX}-${i} sed -i "s/^#track_commit_timestamp.*/track_commit_timestamp = on/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
+    docker exec -t xdb${C_SUFFIX}-${i} sh -c "echo \"host replication enterprisedb 0.0.0.0/0 trust\" >> /var/lib/ppas/${PGMAJOR}/data/pg_hba.conf"
+    docker exec -t xdb${C_SUFFIX}-${i} service ppas-9.5 restart
   fi
 done
 
 printf "\e[0;33m>>> SETTING UP MASTER DATABASE\n\e[0m"
 # Load tables/data
-docker exec -t xdb1 sed -i "s/^export OTHER_MASTER_IPS.*/export OTHER_MASTER_IPS='${OTHER_MASTER_IPS}'/" /usr/ppas-xdb-${XDB_VERSION}/bin/build_xdb_mmr_publication.sh
+docker exec -t xdb${C_SUFFIX}-1 sed -i "s/^export OTHER_MASTER_IPS.*/export OTHER_MASTER_IPS='${OTHER_MASTER_IPS}'/" /usr/ppas-xdb-${XDB_VERSION}/bin/build_xdb_mmr_publication.sh
 
 printf "\e[0;33m>>> SETTING UP REPLICATION\n\e[0m"
-docker exec -t xdb1 bash --login -c "/usr/ppas-xdb-${XDB_VERSION}/bin/build_xdb_mmr_publication.sh"
+docker exec -t xdb${C_SUFFIX}-1 bash --login -c "/usr/ppas-xdb-${XDB_VERSION}/bin/build_xdb_mmr_publication.sh"
 
 printf "\e[0;33m>>> DONE, VERIFYING REPLICATION\n\e[0m"
 # Verify replication works
 for ((i=2;i<=${num_nodes};i++))
 do
-  docker exec -it xdb${i} bash --login -c "psql -c \"SELECT * FROM pgbench_accounts WHERE aid = 1\" edb"
+  docker exec -it xdb${C_SUFFIX}-${i} bash --login -c "psql -c \"SELECT * FROM pgbench_accounts WHERE aid = 1\" edb"
 done
-docker exec -t xdb1 bash --login -c "psql -c \"UPDATE pgbench_accounts SET filler=md5(random()::text) WHERE aid = 1\" edb"
+docker exec -t xdb${C_SUFFIX}-1 bash --login -c "psql -c \"UPDATE pgbench_accounts SET filler=md5(random()::text) WHERE aid = 1\" edb"
 sleep 10
 for ((i=2;i<=${num_nodes};i++))
 do
-  docker exec -it xdb${i} bash --login -c "psql -c \"SELECT * FROM pgbench_accounts WHERE aid = 1\" edb"
+  docker exec -it xdb${C_SUFFIX}-${i} bash --login -c "psql -c \"SELECT * FROM pgbench_accounts WHERE aid = 1\" edb"
 done
 
 printf "\e[0;33m>>> xDB Status\n\e[0m"
 # Check uptime
-docker exec -it xdb1 java -jar /usr/ppas-xdb-${XDB_VERSION}/bin/edb-repcli.jar -repsvrfile /usr/ppas-xdb-${XDB_VERSION}/etc/xdb_repsvrfile.conf -uptime
+docker exec -it xdb${C_SUFFIX}-1 java -jar /usr/ppas-xdb-${XDB_VERSION}/bin/edb-repcli.jar -repsvrfile /usr/ppas-xdb-${XDB_VERSION}/etc/xdb_repsvrfile.conf -uptime
