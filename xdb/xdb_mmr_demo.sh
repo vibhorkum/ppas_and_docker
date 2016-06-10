@@ -40,6 +40,7 @@ do
     PGMAJOR=9.5
     docker exec -t xdb${i} sed -i "s/^wal_level.*/wal_level = logical/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
     docker exec -t xdb${i} sed -i "s/^#max_replication_slots.*/max_replication_slots = 5/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
+    docker exec -t xdb${i} sed -i "s/^#track_commit_timestamp.*/track_commit_timestamp = on/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
     docker exec -t xdb${i} sh -c "echo \"host replication enterprisedb 0.0.0.0/0 trust\" >> /var/lib/ppas/${PGMAJOR}/data/pg_hba.conf"
     docker exec -t xdb${i} service ppas-9.5 restart
   fi
