@@ -17,6 +17,8 @@ RUN yum -y install ppas-xdb ppas-xdb-console ppas-xdb-libs ppas-xdb-publisher wh
 
 # set up xDB
 COPY edb-repl.conf /etc/edb-repl.conf
+RUN chown enterprisedb:enterprisedb /etc/edb-repl.conf
+RUN chmod 600 /etc/edb-repl.conf
 RUN sed -i "s/pgport_placeholder/${PGPORT}/" /etc/edb-repl.conf
 COPY xdb_repsvrfile.conf ${INSTALLDIR}/etc/xdb_repsvrfile.conf
 COPY xdb_repsvrfile.conf ${INSTALLDIR}/etc/xdb_subsvrfile.conf
