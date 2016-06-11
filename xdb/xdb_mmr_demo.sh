@@ -38,16 +38,19 @@ do
   IP=`docker exec -it ${C_NAME} ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
   printf "\e[0;33m${C_NAME} => ${IP}\n\e[0m"
   OTHER_MASTER_IPS="${OTHER_MASTER_IPS} ${IP}"
-  if [[ ${XDB_VERSION} == '6.0' ]]
-  then
+done
+if [[ ${XDB_VERSION} == '6.0' ]]
+then
+  for ((i=1;i<=${num_nodes};i++))
+  do
     PGMAJOR=9.5
     docker exec -t xdb${C_SUFFIX}-${i} sed -i "s/^wal_level.*/wal_level = logical/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
     docker exec -t xdb${C_SUFFIX}-${i} sed -i "s/^#max_replication_slots.*/max_replication_slots = 5/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
     docker exec -t xdb${C_SUFFIX}-${i} sed -i "s/^#track_commit_timestamp.*/track_commit_timestamp = on/" /var/lib/ppas/${PGMAJOR}/data/postgresql.conf
     docker exec -t xdb${C_SUFFIX}-${i} sh -c "echo \"host replication enterprisedb 0.0.0.0/0 trust\" >> /var/lib/ppas/${PGMAJOR}/data/pg_hba.conf"
     docker exec -t xdb${C_SUFFIX}-${i} service ppas-9.5 restart
-  fi
-done
+  done
+fi
 
 printf "\e[0;33m>>> SETTING UP MASTER DATABASE\n\e[0m"
 # Load tables/data
