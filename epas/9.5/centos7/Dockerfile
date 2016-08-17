@@ -40,6 +40,7 @@ RUN echo "local  replication all                 trust" >> ${PGDATA}/pg_hba.conf
 RUN echo "host   replication repuser  0.0.0.0/0  trust" >> ${PGDATA}/pg_hba.conf
 RUN echo "host   all         all      0.0.0.0/0  trust" >> ${PGDATA}/pg_hba.conf
 
+RUN sed -i "s/^#port = .*/port = ${PGPORT}/"         ${PGDATA}/postgresql.conf
 RUN sed -i "s/^port = .*/port = ${PGPORT}/"         ${PGDATA}/postgresql.conf
 RUN sed -i "s/^logging_collector = off/logging_collector = on/" ${PGDATA}/postgresql.conf                                                                                  
 RUN sed -i "s/^#wal_level.*/wal_level=hot_standby/" ${PGDATA}/postgresql.conf
@@ -52,6 +53,6 @@ CMD pg_ctl -D ${PGDATA} start && tail -F ${PGLOG}
 
 # To create a container with this image:
 #   docker run --privileged -itd -e "container=docker" -v /sys/fs/cgroup:/sys/fs/cgroup %%image_name%% /usr/sbin/init # an any additional flags you want
-#   docker exec -itd %%container_hash%% systemctl enable ppas-9.5.service
-#   docker exec -itd %%container_hash%% systemctl start ppas-9.5.service
+#   docker exec -it %%container_hash%% systemctl enable ppas-9.5.service
+#   docker exec -it %%container_hash%% systemctl start ppas-9.5.service
 #   docker exec -it %%container_hash%% psql -l
