@@ -7,6 +7,7 @@ export MDN_IP=`hostname -i`
 export OTHER_MASTER_IPS=''
 
 # Start xDB
+rm -f /var/run/edb/xdbpubserver/edb-xdbpubserver.pid
 rm -f /var/run/edb-xdbpubserver/edb-xdbpubserver.pid
 service edb-xdbpubserver start
 

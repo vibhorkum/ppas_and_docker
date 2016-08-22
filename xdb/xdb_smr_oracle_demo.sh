@@ -46,20 +46,21 @@ docker exec -t ${O_NAME} bash --login -c "sqlplus -S system/oracle < /xdb_demo/o
 ENCRYPTED_ORA_PASS="deIuKoLKPi4=" # Plaintext password is "oracle"
 
 printf "\e[0;33m>>> SETTING UP REPLICATION\n\e[0m"
-docker exec -t xdb_postgres bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -addpubdb -repsvrfile ${XDB_PATH}/etc/xdb_repsvrfile.conf -dbtype oracle -dbhost ${ORA_IP} -dbuser system -dbpassword ${ENCRYPTED_ORA_PASS} -database XE -dbport 1521"
-docker exec -t xdb_postgres bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -createpub xdbtest -repsvrfile ${XDB_PATH}/etc/xdb_repsvrfile.conf -pubdbid 1 -reptype T -tables SYSTEM.TEST_DATA -repgrouptype S"
-docker exec -t xdb_postgres bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -addsubdb -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf -dbtype enterprisedb -dbhost ${PG_IP} -dbuser enterprisedb -dbpassword \`cat ${XDB_PATH}/etc/xdb_subsvrfile.conf | grep pass | cut -f2- -d'='\` -database edb -dbport 5432 -repgrouptype S"
-SUBDB_ID=`docker exec -t xdb_postgres bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -printsubdbids -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf" | tail -n 1 | awk '{ printf("%d",$1) }'` # repcli does something funky with the output, so pipe it through awk to clean it up
-docker exec -t xdb_postgres bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -createsub xdbsub -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf -subdbid ${SUBDB_ID} -pubsvrfile ${XDB_PATH}/etc/xdb_repsvrfile.conf -pubname xdbtest"
-docker exec -t xdb_postgres bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -dosnapshot xdbsub -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf"
+docker exec -t ${P_NAME} bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -addpubdb -repsvrfile ${XDB_PATH}/etc/xdb_repsvrfile.conf -dbtype oracle -dbhost ${ORA_IP} -dbuser system -dbpassword ${ENCRYPTED_ORA_PASS} -database XE -dbport 1521"
+docker exec -t ${P_NAME} bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -createpub xdbtest -repsvrfile ${XDB_PATH}/etc/xdb_repsvrfile.conf -pubdbid 1 -reptype T -tables SYSTEM.TEST_DATA SYSTEM.TEST_DATAB SYSTEM.TEST_DATAC SYSTEM.TEST_DATAD -repgrouptype S"
+docker exec -t ${P_NAME} bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -addsubdb -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf -dbtype enterprisedb -dbhost ${PG_IP} -dbuser enterprisedb -dbpassword \`cat ${XDB_PATH}/etc/xdb_subsvrfile.conf | grep pass | cut -f2- -d'='\` -database edb -dbport 5432 -repgrouptype S"
+SUBDB_ID=`docker exec -t ${P_NAME} bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -printsubdbids -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf" | tail -n 1 | awk '{ printf("%d",$1) }'` # repcli does something funky with the output, so pipe it through awk to clean it up
+docker exec -t ${P_NAME} bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -createsub xdbsub -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf -subdbid ${SUBDB_ID} -pubsvrfile ${XDB_PATH}/etc/xdb_repsvrfile.conf -pubname xdbtest"
+docker exec -t ${P_NAME} bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -dosnapshot xdbsub -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf"
+# docker exec -t ${P_NAME} bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -confschedule xdbsub -subsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf -realtime 5"
 
 printf "\e[0;33m>>> DONE, VERIFYING REPLICATION\n\e[0m"
-docker exec -it xdb_oracle bash --login -c "echo \"SELECT * FROM test_data WHERE id = 10000;\" | sqlplus -S system/oracle"
-docker exec -it xdb_postgres bash --login -c "psql -c \"SELECT * FROM system.test_data WHERE id = 10000\" edb"
-docker exec -it xdb_oracle bash --login -c "echo \"update test_data set first_name = 'my_name_changed' where id = 10000;\" | sqlplus -S system/oracle"
+docker exec -it ${O_NAME} bash --login -c "echo \"SELECT * FROM test_data WHERE id = 10000;\" | sqlplus -S system/oracle"
+docker exec -it ${P_NAME} bash --login -c "psql -c \"SELECT * FROM system.test_data WHERE id = 10000\" edb"
+docker exec -it ${O_NAME} bash --login -c "echo \"update test_data set first_name = 'my_name_changed' where id = 10000;\" | sqlplus -S system/oracle"
 sleep 5
-docker exec -t xdb_postgres bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -dosynchronize xdbsub -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf"
+docker exec -t ${P_NAME} bash --login -c "java -jar ${XDB_PATH}/bin/edb-repcli.jar -dosynchronize xdbsub -repsvrfile ${XDB_PATH}/etc/xdb_subsvrfile.conf"
 sleep 10
 
-docker exec -it xdb_oracle bash --login -c "echo \"SELECT * FROM test_data WHERE id = 10000;\" | sqlplus -S system/oracle"
-docker exec -it xdb_postgres bash --login -c "psql -c \"SELECT * FROM system.test_data WHERE id = 10000\" edb"
+docker exec -it ${O_NAME} bash --login -c "echo \"SELECT * FROM test_data WHERE id = 10000;\" | sqlplus -S system/oracle"
+docker exec -it ${P_NAME} bash --login -c "psql -c \"SELECT * FROM system.test_data WHERE id = 10000\" edb"

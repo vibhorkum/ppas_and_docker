@@ -11,19 +11,6 @@ then
   exit 0
 fi
 
-if [[ ${1} == 'image' ]]
-then
-	printf "\e[0;33m==== Building new image for xDB cluster ====\n\e[0m"
-  sleep 10
-
-  # Create Image
-	printf "\e[0;33m==== Building new image for xDB cluster ====\n\e[0m"
-  PWD=`pwd`
-  cd ${PWD}/${XDB_VERSION}
-  docker build --no-cache --build-arg EDBUSERNAME=${EDBUSERNAME} --build-arg EDBPASSWORD=${EDBPASSWORD} --build-arg INSTALLER_FILENAME=${INSTALLER_FILENAME} -t ${IMAGE_NAME} .
-  cd ${PWD}
-fi
-
 printf "\e[0;33m==== Building containers for xDB cluster ====\n\e[0m"
 for i in master slave
 do

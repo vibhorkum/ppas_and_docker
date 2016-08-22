@@ -1,2 +1,4 @@
 *.run
 ojdbc6.jar
+epas/Dockerfile
+*_build.log
