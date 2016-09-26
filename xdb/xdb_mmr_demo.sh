@@ -51,14 +51,10 @@ then
     docker exec -t xdb${C_SUFFIX}-${i} sh -c "echo \"host replication enterprisedb 0.0.0.0/0 trust\" >> /var/lib/ppas/${PGMAJOR}/data/pg_hba.conf"
     docker exec -t xdb${C_SUFFIX}-${i} service ppas-9.5 restart
   done
-
-  # Uncomment and fill in as needed (file needs to be in the form of "license_key=#####-#####-#####-#####-#####")
-  # docker exec -it xdb${C_SUFFIX}-1 java -jar /usr/ppas-xdb-${XDB_VERSION}/bin/edb-repcli.jar -repsvrfile /usr/ppas-xdb-${XDB_VERSION}/etc/xdb_repsvrfile.conf -registerkey -keyfile /Desktop/xdb_license.key
-else
-  # Uncomment and fill in as needed (file needs to be in the form of "license_key=#####-#####-#####-#####-#####")
-  # docker exec -t xdb${C_SUFFIX}-1 sh -c "cat /Desktop/xdb_license.key >> /etc/edb-repl.conf"
-  echo "" # Superflous statement to keep if-else loop working when above line is commented out
 fi
+
+# Uncomment and fill in as needed (file needs to be in the form of "license_key=#####-#####-#####-#####-#####")
+docker exec -t xdb${C_SUFFIX}-1 sh -c "cat /Desktop/xdb_license.key >> /etc/edb-repl.conf"
 
 printf "\e[0;33m>>> SETTING UP MASTER DATABASE\n\e[0m"
 # Load tables/data
