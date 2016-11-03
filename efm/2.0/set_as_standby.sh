@@ -5,7 +5,7 @@ PGMAJOR=null
 # Script to be run on to-be standby
 MASTER_HOST=${1}
 ARCHIVE_DIR="/var/lib/ppas/${PGMAJOR}/wal_archive"
-DATADIR='/var/lib/ppas/${PGMAJOR}/data'
+DATADIR="/var/lib/ppas/${PGMAJOR}/data"
 
 # Make sure repuser exists already
 if [[ `psql -h ${MASTER_HOST} -Atc "SELECT count(*) FROM pg_shadow WHERE usename = 'repuser'" edb enterprisedb` -eq 0 ]]
