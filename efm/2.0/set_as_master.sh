@@ -1,8 +1,10 @@
 #!/bin/bash
 
+PGMAJOR=null
+
 # Make sure Postgres is running
-service ppas-pgmajor_placeholder stop
-service ppas-pgmajor_placeholder start
+service ppas-${PGMAJOR} stop
+service ppas-${PGMAJOR} start
 
 psql edb enterprisedb -c "create user repuser replication"
 

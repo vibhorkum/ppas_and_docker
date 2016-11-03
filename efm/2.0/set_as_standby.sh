@@ -1,9 +1,11 @@
 #!/bin/bash
 
+PGMAJOR=null
+
 # Script to be run on to-be standby
 MASTER_HOST=${1}
-ARCHIVE_DIR="/var/lib/ppas/pgmajor_placeholder/wal_archive"
-DATADIR='/var/lib/ppas/pgmajor_placeholder/data'
+ARCHIVE_DIR="/var/lib/ppas/${PGMAJOR}/wal_archive"
+DATADIR='/var/lib/ppas/${PGMAJOR}/data'
 
 # Make sure repuser exists already
 if [[ `psql -h ${MASTER_HOST} -Atc "SELECT count(*) FROM pg_shadow WHERE usename = 'repuser'" edb enterprisedb` -eq 0 ]]
@@ -12,7 +14,7 @@ then
 fi
   
 # Stop existing local postgres service
-service ppas-pgmajor_placeholder stop
+service ppas-${PGMAJOR} stop
 
 # Create archive_dir for archive_command
 rm -rf ${ARCHIVE_DIR}
@@ -41,7 +43,7 @@ chown -R enterprisedb:enterprisedb ${DATADIR}
 chmod 700 ${DATADIR}
 
 # Start postgres
-service ppas-pgmajor_placeholder start
+service ppas-${PGMAJOR} start
 
 # Configure and start EFM
 sed -i "s/bind.address.*/bind.address=`hostname -i`:5430/" /etc/efm-2.0/efm.properties

@@ -22,8 +22,8 @@ RUN chown enterprisedb:enterprisedb /opt/backup
 COPY set_as_master.sh  ${INSTALLDIR}/bin/set_as_master.sh
 COPY set_as_standby.sh ${INSTALLDIR}/bin/set_as_standby.sh
 COPY set_as_witness.sh ${INSTALLDIR}/bin/set_as_witness.sh
-RUN sed -i "s/pgmajor_placeholder/${PGMAJOR}/g" ${INSTALLDIR}/bin/set_as_master.sh
-RUN sed -i "s/pgmajor_placeholder/${PGMAJOR}/g" ${INSTALLDIR}/bin/set_as_standby.sh
+RUN sed -i "s/PGMAJOR=null/PGMAJOR=${PGMAJOR}/g" ${INSTALLDIR}/bin/set_as_master.sh
+RUN sed -i "s/PGMAJOR=null/PGMAJOR=${PGMAJOR}/g" ${INSTALLDIR}/bin/set_as_standby.sh
 
 COPY efm.properties /etc/efm-2.0/efm.properties
 RUN cp /etc/efm-2.0/efm.nodes.in /etc/efm-2.0/efm.nodes
