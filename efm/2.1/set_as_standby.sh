@@ -46,7 +46,7 @@ chmod 700 ${DATADIR}
 service ppas-${PGMAJOR} start
 
 # Configure and start EFM
-sed -i "s/bind.address.*/bind.address=`hostname -i`:5430/" /etc/efm-2.0/efm.properties
-echo "${MASTER_HOST}:5430" >> /etc/efm-2.0/efm.nodes
-service efm-2.0 start
+sed -i "s/bind.address.*/bind.address=`hostname -i`:5430/" /etc/efm-2.1/efm.properties
+echo "${MASTER_HOST}:5430" >> /etc/efm-2.1/efm.nodes
+service efm-2.1 start
 

@@ -39,6 +39,7 @@ do
   printf "\e[0;33m${C_NAME} => ${IP}\n\e[0m"
   OTHER_MASTER_IPS="${OTHER_MASTER_IPS} ${IP}"
 done
+
 if [[ ${XDB_VERSION} == '6.0' ]]
 then
   for ((i=1;i<=${num_nodes};i++))
@@ -51,6 +52,9 @@ then
     docker exec -t xdb${C_SUFFIX}-${i} service ppas-9.5 restart
   done
 fi
+
+# Uncomment and fill in as needed (file needs to be in the form of "license_key=#####-#####-#####-#####-#####")
+docker exec -t xdb${C_SUFFIX}-1 sh -c "cat /Desktop/xdb_license.key >> /etc/edb-repl.conf"
 
 printf "\e[0;33m>>> SETTING UP MASTER DATABASE\n\e[0m"
 # Load tables/data

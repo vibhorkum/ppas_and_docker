@@ -39,6 +39,8 @@ fi
 
 XDB_PATH="/usr/ppas-xdb-${XDB_VERSION}"
 docker exec -t ${P_NAME} bash --login -c "cp /xdb_demo/oracle_files/ojdbc6.jar ${XDB_PATH}/lib/jdbc/ojdbc6.jar"
+docker exec -t ${P_NAME} bash --login -c "rm -f /var/run/edb-xdbpubserver/edb-xdbpubserver.pid"
+docker exec -t ${P_NAME} bash --login -c "rm -f /var/run/edb-xdbsubserver/edb-xdbsubserver.pid"
 docker exec -t ${P_NAME} bash --login -c "/etc/init.d/edb-xdbpubserver start"
 docker exec -t ${P_NAME} bash --login -c "/etc/init.d/edb-xdbsubserver start"
 docker exec -t ${O_NAME} bash --login -c "sqlplus -S system/oracle < /xdb_demo/oracle_files/load_oracle_test_data.sql"
