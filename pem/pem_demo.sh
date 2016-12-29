@@ -16,14 +16,14 @@ fi
 # Create Containers
 printf "\e[0;33m==== Building containers for PEM cluster ====\n\e[0m"
 printf "\e[0;33m>>> SETTING UP PEM SERVER\n\e[0m"
-  docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=pem-server pem5_server:5.0.3
+  docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=pem-server pem6_server:latest
 printf "\e[0;33m>>> SETTING UP PEM AGENTS\n\e[0m"
 
 MASTER_IP=`docker exec -it pem-server ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
 for ((i=1;i<=${NUM_AGENTS};i++))
 do
   C_NAME="pem-agent${i}"
-  docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} pem5_agent:5.0.3
+  docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} pem6_agent:latest
   docker exec -t pem-agent${i} bash --login -c "/tmp/install_pem_agent.sh ${MASTER_IP}"
 done
 
