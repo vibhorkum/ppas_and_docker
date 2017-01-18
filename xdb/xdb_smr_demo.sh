@@ -1,7 +1,14 @@
 #!/bin/bash
 
-IMAGE_NAME="xdb51:latest"
-XDB_VERSION="5.1"
+C_SUFFIX=${1}
+if [[ ${C_SUFFIX} -eq 6 ]]
+then
+  XDB_VERSION="6.0"
+  IMAGE_NAME="xdb6:latest"
+else
+  XDB_VERSION="5.1"
+  IMAGE_NAME="xdb51:latest"
+fi
 
 if [[ ${1} == 'destroy' ]]
 then
