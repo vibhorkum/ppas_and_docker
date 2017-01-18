@@ -20,6 +20,8 @@ printf "\e[0;33m>>> SETTING UP PEM SERVER\n\e[0m"
 docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=pem-server --detach=true --name=pem-server pem${PEM_VER}_server:latest
 
 printf "\e[0;33m>>> SETTING UP PEM AGENTS\n\e[0m"
+docker exec pem-server service pemagent start
+
 MASTER_IP=`docker exec -it pem-server ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
 for ((i=1;i<=${NUM_AGENTS};i++))
 do
@@ -29,6 +31,8 @@ do
   then
     docker exec -t pem-agent${i} sed -i "s/%%PEM_SERVER_IP%%/${MASTER_IP}/" /tmp/register_pem_agent.sh
     docker exec -t pem-agent${i} sed -i "s/%%AGENT_NAME%%/pemagent${i}/" /tmp/register_pem_agent.sh
+    docker exec -t pem-agent${i} bash --login -c "/tmp/register_pem_agent.sh"
+    docker exec pem-agent${i} service pemagent start
   else
     docker exec -t pem-agent${i} bash --login -c "/tmp/install_pem_agent.sh ${MASTER_IP}"
   fi
