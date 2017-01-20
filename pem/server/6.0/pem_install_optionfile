@@ -6,3 +6,4 @@ pgport=5432
 pguser=enterprisedb
 pgpassword=abc123
 servicename=ppas-9.5
+cidr-address=0.0.0.0/0
