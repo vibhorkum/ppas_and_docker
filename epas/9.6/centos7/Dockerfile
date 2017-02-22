@@ -4,20 +4,20 @@ MAINTAINER richard.yen@enterprisedb.com
 ARG YUMUSERNAME
 ARG YUMPASSWORD 
 
-ENV REPONAME=ppas95
-ENV PGMAJOR=9.5
+ENV PGMAJOR=9.6
+ENV SHORTVER=96
 ENV PGPORT=5432
 ENV PGDATABASE=edb
 ENV PGUSER=enterprisedb
-ENV PATH=/usr/ppas-${PGMAJOR}/bin:${PATH}
-ENV PGDATA=/var/lib/ppas/${PGMAJOR}/data
-ENV PGLOG=/var/lib/ppas/${PGMAJOR}/pgstartup.log
+ENV PATH=/usr/edb/as${PGMAJOR}/bin:${PATH}
+ENV PGDATA=/var/lib/edb/as${PGMAJOR}/data
+ENV PGLOG=/var/lib/edb/as${PGMAJOR}/pgstartup.log
 
-RUN rpm -ivh http://yum.enterprisedb.com/reporpms/${REPONAME}-repo-${PGMAJOR}-1.noarch.rpm
-RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/${REPONAME}.repo
+RUN rpm -ivh http://yum.enterprisedb.com/edbrepos/edb-repo-9.6-4.noarch.rpm
+RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/edb.repo
 
 RUN yum -y update
-RUN yum -y install ${REPONAME}-server.x86_64 sudo
+RUN yum -y --enablerepo=edbas${SHORTVER} --enablerepo=enterprisedb-dependencies install edb-as${SHORTVER}-server.x86_64 sudo
 
 RUN echo 'root:root'|chpasswd
 
@@ -28,7 +28,7 @@ RUN echo 'postgres:postgres'|chpasswd
 
 RUN gosu enterprisedb initdb -D ${PGDATA}
 
-RUN sed -i "s/^PGPORT.*/PGPORT=${PGPORT}/" /etc/sysconfig/ppas/ppas-${PGMAJOR}
+RUN sed -i "s/^PGPORT.*/PGPORT=${PGPORT}/" /etc/sysconfig/edb/as${PGMAJOR}/edb-as-${PGMAJOR}.sysconfig
 
 RUN echo "export PGPORT=${PGPORT}"         >> /etc/profile.d/pg_env.sh
 RUN echo "export PGDATABASE=${PGDATABASE}" >> /etc/profile.d/pg_env.sh
@@ -53,6 +53,6 @@ CMD pg_ctl -D ${PGDATA} start && tail -F ${PGLOG}
 
 # To create a container with this image:
 #   docker run --privileged -itd -e "container=docker" -v /sys/fs/cgroup:/sys/fs/cgroup %%image_name%% /usr/sbin/init # and any additional flags you want
-#   docker exec -it %%container_hash%% systemctl enable ppas-9.5.service
-#   docker exec -it %%container_hash%% systemctl start ppas-9.5.service
+#   docker exec -it %%container_hash%% systemctl enable edb-as-9.6.service
+#   docker exec -it %%container_hash%% systemctl start edb-as-9.6.service
 #   docker exec -it %%container_hash%% psql -l
