@@ -1,5 +1,5 @@
 FROM gisjedi/gosu-centos
-MAINTAINER richard.yen@enterprisedb.com
+MAINTAINER vibhor.aim@gmail.com
 
 ARG YUMUSERNAME
 ARG YUMPASSWORD 

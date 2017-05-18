@@ -1,5 +1,5 @@
-FROM ppas95:latest
-MAINTAINER richard.yen@enterprisedb.com
+FROM epas95:latest
+MAINTAINER vibhor.aim@gmail.com
 
 ARG YUMUSERNAME
 ARG YUMPASSWORD
@@ -12,6 +12,8 @@ RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.rep
 
 # run update and install require packages.
 RUN yum --enablerepo=enterprisedb-tools install -y which efm21 java-1.7.0-openjdk
+RUN yum update -y
+RUN yum install vim -y
 
 RUN mkdir -p /opt/backup
 RUN mkdir -p /var/lib/ppas/${PGMAJOR}/wal_archive

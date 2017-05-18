@@ -1,5 +1,5 @@
 FROM gisjedi/gosu-centos
-MAINTAINER richard.yen@enterprisedb.com
+MAINTAINER vibhor.aim@gmail.com
 
 ARG YUMUSERNAME
 ARG YUMPASSWORD 
@@ -17,7 +17,7 @@ RUN rpm -ivh http://yum.enterprisedb.com/edbrepos/edb-repo-9.6-4.noarch.rpm
 RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/edb.repo
 
 RUN yum -y update
-RUN yum -y --enablerepo=edbas${SHORTVER} --enablerepo=enterprisedb-dependencies install edb-as${SHORTVER}-server.x86_64 sudo
+RUN yum -y --enablerepo=edbas${SHORTVER} --enablerepo=enterprisedb-dependencies install edb-as${SHORTVER}-server.x86_64 sudo vim file net-tools
 
 RUN echo 'root:root'|chpasswd
 

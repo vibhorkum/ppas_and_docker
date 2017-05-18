@@ -1,5 +1,5 @@
 FROM centos:6.6
-MAINTAINER richard.yen@enterprisedb.com
+MAINTAINER vibhor.aim@gmail.com
 
 ARG YUMUSERNAME
 ARG YUMPASSWORD 
