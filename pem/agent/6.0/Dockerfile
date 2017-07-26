@@ -16,5 +16,6 @@ RUN sed -i "s/pem_port=.*/pem_port=5432/" /usr/pem-6.0/etc/agent.cfg
 RUN sed -i "s/agent_id=.*/agent_id=%%AGENT_ID%%/" /usr/pem-6.0/etc/agent.cfg
 
 # Create script to register agent
-RUN echo "/usr/pem-6.0/bin/pemagent --register-agent --pem-server %%PEM_SERVER_IP%% --pem-user enterprisedb --display-name %%AGENT_NAME%%" >> /tmp/register_pem_agent.sh
+RUN echo "# For versions prior to 6.0.2, use pemagent instead of pemworker" >> /tmp/register_pem_agent.sh
+RUN echo "/usr/pem-6.0/bin/pemworker --register-agent --pem-server %%PEM_SERVER_IP%% --pem-user enterprisedb --display-name %%AGENT_NAME%%" >> /tmp/register_pem_agent.sh
 RUN chmod 755 /tmp/register_pem_agent.sh
