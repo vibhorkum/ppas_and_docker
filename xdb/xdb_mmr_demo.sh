@@ -53,8 +53,8 @@ then
   done
 fi
 
-# Uncomment and fill in as needed (file needs to be in the form of "license_key=#####-#####-#####-#####-#####")
-docker exec -t xdb${C_SUFFIX}-1 sh -c "cat /Desktop/xdb_license.key >> /etc/edb-repl.conf"
+# Uncomment and fill in as needed
+# docker exec -t xdb${C_SUFFIX}-1 sh -c "echo license_key=#####-#####-#####-#####-##### >> /etc/edb-repl.conf"
 
 printf "\e[0;33m>>> SETTING UP MASTER DATABASE\n\e[0m"
 # Load tables/data
