@@ -32,6 +32,8 @@ for i in master standby witness
 do
   C_NAME="efm-${i}"
   docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} ${IMAGE_NAME}
+  # Uncomment and fill in license as needed
+  # docker exec -t efm-${i} sed -i "s/efm.license=/efm.license=#####-#####-#####-#####-#####/" /etc/efm-2.1/efm.properties
 done
 
 # Set up master
