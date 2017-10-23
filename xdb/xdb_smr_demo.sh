@@ -28,6 +28,8 @@ do
 done
 
 printf "\e[0;33m>>> SETTING UP REPLICATION\n\e[0m"
+# Uncomment below to use WAL-based replication
+# docker exec -t xdb_smr_master sed -i "s/addpubdb/addpubdb -changesetlogmode W/" /usr/ppas-xdb-${XDB_VERSION}/bin/build_xdb_smr_publication.sh
 SUB_IP=`docker exec -it xdb_smr_slave ifconfig | grep Bcast | awk '{ print $2 }' | cut -f2 -d':' | xargs echo -n`
 docker exec -t xdb_smr_master bash --login -c "/usr/ppas-xdb-${XDB_VERSION}/bin/build_xdb_smr_publication.sh ${SUB_IP}"
 
@@ -46,3 +48,6 @@ for i in master slave
 do
   docker exec -it xdb_smr_${i} bash --login -c "psql -c \"SELECT * FROM pgbench_accounts WHERE aid = 1\" edb"
 done
+
+# Uncomment below to set up synchronization schedule
+# docker exec -it xdb_smr_master java -jar edb-repcli.jar -confschedule xdbsub -jobtype s -realtime 1 -repsvrfile /usr/ppas-xdb-${XDB_VERSION}/etc/xdb_subsvrfile.conf
