@@ -50,4 +50,4 @@ do
 done
 
 # Uncomment below to set up synchronization schedule
-# docker exec -it xdb_smr_master java -jar edb-repcli.jar -confschedule xdbsub -jobtype s -realtime 1 -repsvrfile /usr/ppas-xdb-${XDB_VERSION}/etc/xdb_subsvrfile.conf
+# docker exec -it xdb_smr_master java -jar /usr/ppas-xdb-${XDB_VERSION}/bin/edb-repcli.jar -confschedule xdbsub -jobtype s -realtime 1 -repsvrfile /usr/ppas-xdb-${XDB_VERSION}/etc/xdb_subsvrfile.conf
