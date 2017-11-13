@@ -16,7 +16,7 @@ COPY pem_install_optionfile /tmp/pem_install_optionfile
 RUN sed -i "s/existing-user=.*/existing-user=${EDBUSERNAME}/" /tmp/pem_install_optionfile
 RUN sed -i "s/existing-password=.*/existing-password=${EDBPASSWORD}/" /tmp/pem_install_optionfile
 
-# Extract Python dependencies
+# Extract dependencies
 RUN /tmp/${INSTALLER_FILENAME}  --extract-languagepack /opt/languagepack --extract-pem-httpd /opt/pem-httpd
 
 # Install dependencies and PEM Server
