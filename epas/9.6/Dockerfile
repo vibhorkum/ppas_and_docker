@@ -4,8 +4,9 @@ MAINTAINER richard.yen@enterprisedb.com
 ARG YUMUSERNAME
 ARG YUMPASSWORD
 
-ENV REPONAME=%%REPONAME%%
-ENV PGMAJOR=%%PGMAJOR%%
+ENV REPONAME=edbas96
+ENV FOO=96
+ENV PGMAJOR=9.6
 ENV PGPORT=5432
 ENV PGDATABASE=edb
 ENV PGUSER=enterprisedb
@@ -17,7 +18,7 @@ RUN rpm -ivh http://yum.enterprisedb.com/edbrepos/edb-repo-latest.noarch.rpm
 RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/edb.repo
 
 RUN yum -y update
-RUN yum -y --enablerepo=enterprisedb-dependencies --enablerepo=${REPONAME} install edb-as${PGMAJOR}-server.x86_64 sudo
+RUN yum -y --enablerepo=enterprisedb-dependencies --enablerepo=${REPONAME} install edb-as${FOO}-server.x86_64 sudo
 
 RUN echo 'root:root'|chpasswd
 

@@ -15,7 +15,10 @@ RUN yum -y update
 
 COPY ${INSTALLER_FILENAME} /tmp/${INSTALLER_FILENAME}
 RUN chmod 755 /tmp/${INSTALLER_FILENAME}
-RUN /tmp/${INSTALLER_FILENAME} --mode unattended --prefix /usr/ppas-${PGMAJOR} --datadir ${PGDATA}
+
+# For legacy installers, use the commented one below
+# RUN /tmp/${INSTALLER_FILENAME} --mode unattended --prefix /usr/ppas-${PGMAJOR} --datadir ${PGDATA}
+RUN /tmp/${INSTALLER_FILENAME} --mode unattended --webusername "${EDBUSERNAME}" --webpassword "${EDBPASSWORD}" --prefix /usr/ppas-${PGMAJOR} --datadir ${PGDATA}
 
 RUN echo 'root:root'|chpasswd
 
@@ -42,4 +45,6 @@ RUN sed -i "s/^#max_wal_senders = 0/max_wal_senders = 5/" ${PGDATA}/postgresql.c
 
 EXPOSE ${PGPORT}
 
-CMD service ppas-${PGMAJOR} restart && tail -F ${PGLOG}
+# For legacy versions, use the commented one below
+# CMD service ppas-${PGMAJOR} restart && tail -F ${PGLOG}
+CMD service edb-as-${PGMAJOR} restart && tail -F ${PGLOG}
