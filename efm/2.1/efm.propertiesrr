@@ -68,7 +68,7 @@ jdbc.ssl.mode=verify-ca
 # be the same across all agents. Multiple email addresses must
 # be separated by space. If using a notification script instead,
 # this property can be left blank.
-user.email=vibhor.aim@gmail.com
+user.email=richard.yen@enterprisedb.com
 
 # Absolute path to script run for user notifications.
 #

@@ -1,5 +1,5 @@
 FROM gisjedi/gosu-centos
-MAINTAINER richard.yen@enterprisedb.com
+MAINTAINER vibhor.aim@gmail.com
 
 ARG YUMUSERNAME
 ARG YUMPASSWORD 
@@ -52,7 +52,7 @@ EXPOSE ${PGPORT}
 CMD pg_ctl -D ${PGDATA} start && tail -F ${PGLOG}
 
 # To create a container with this image:
-#   docker run --privileged -itd -e "container=docker" -v /sys/fs/cgroup:/sys/fs/cgroup %%image_name%% /usr/sbin/init # an any additional flags you want
+#   docker run --privileged -itd -e "container=docker" -v /sys/fs/cgroup:/sys/fs/cgroup %%image_name%% /usr/sbin/init # and any additional flags you want
 #   docker exec -it %%container_hash%% systemctl enable ppas-9.5.service
 #   docker exec -it %%container_hash%% systemctl start ppas-9.5.service
 #   docker exec -it %%container_hash%% psql -l

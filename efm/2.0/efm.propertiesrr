@@ -74,7 +74,7 @@ jgroups.timeout=5000
 
 # Email address of the user for notifications. The value of this
 # property must be the same across all agents.
-user.email=vibhor.aim@gmail.com
+user.email=richard.yen@enterprisedb.com
 
 # This property specifies the ip address and port that jgroups
 # will bind to on this node. The value is of the form <ip>:<port>.
