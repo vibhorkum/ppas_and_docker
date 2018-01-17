@@ -1,5 +1,5 @@
 FROM ppas95:latest
-MAINTAINER richard.yen@enterprisedb.com
+MAINTAINER vibhor.aim@gmail.com
 
 ARG EDBUSERNAME
 ARG EDBPASSWORD
