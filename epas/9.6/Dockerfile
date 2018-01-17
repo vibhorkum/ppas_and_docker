@@ -1,23 +1,25 @@
 FROM centos:6.6
+
 MAINTAINER vibhor.aim@gmail.com
-
 ARG YUMUSERNAME
-ARG YUMPASSWORD 
+ARG YUMPASSWORD
 
+ENV REPONAME=edbas96
+ENV FOO=96
 ENV PGMAJOR=9.6
-ENV SHORTVER=96
 ENV PGPORT=5432
 ENV PGDATABASE=edb
 ENV PGUSER=enterprisedb
-ENV PATH=/usr/edb/as${PGMAJOR}/bin:${PATH}
+ENV PATH=/usr/edb-as${PGMAJOR}/bin:${PATH}
 ENV PGDATA=/var/lib/edb/as${PGMAJOR}/data
 ENV PGLOG=/var/lib/edb/as${PGMAJOR}/pgstartup.log
 
-RUN rpm -ivh http://yum.enterprisedb.com/edbrepos/edb-repo-9.6-4.noarch.rpm
+RUN rpm -ivh http://yum.enterprisedb.com/edbrepos/edb-repo-latest.noarch.rpm
 RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/edb.repo
 
 RUN yum -y update
-RUN yum -y --enablerepo=edbas${SHORTVER} --enablerepo=enterprisedb-dependencies install edb-as${SHORTVER}-server.x86_64 sudo
+RUN yum -y install yum-plugin-ovl
+RUN yum -y --enablerepo=enterprisedb-dependencies --enablerepo=${REPONAME} install edb-as${FOO}-server.x86_64 sudo
 
 RUN echo 'root:root'|chpasswd
 
@@ -41,6 +43,8 @@ RUN echo "host   replication repuser  0.0.0.0/0  trust" >> ${PGDATA}/pg_hba.conf
 RUN echo "host   all         all      0.0.0.0/0  trust" >> ${PGDATA}/pg_hba.conf
 
 RUN sed -i "s/^port = .*/port = ${PGPORT}/"         ${PGDATA}/postgresql.conf
+
+
 RUN sed -i "s/^logging_collector = off/logging_collector = on/" ${PGDATA}/postgresql.conf                                                                                  
 RUN sed -i "s/^#wal_level.*/wal_level=hot_standby/" ${PGDATA}/postgresql.conf
 RUN sed -i "s/^#wal_keep_segments = 0/wal_keep_segments = 500/" ${PGDATA}/postgresql.conf

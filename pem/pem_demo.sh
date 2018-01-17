@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PEM_VER=6
+PEM_VER=7
 NUM_AGENTS=2
 
 if [[ ${1} == 'destroy' ]]
@@ -29,6 +29,15 @@ do
   docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} pem${PEM_VER}_agent:latest
   if [[ ${PEM_VER} -eq 6 ]]
   then
+    docker exec -t pem-agent${i} sed -i "s/pemagent/pemworker/" /tmp/register_pem_agent.sh
+    docker exec -t pem-agent${i} sed -i "s/%%PEM_SERVER_IP%%/${MASTER_IP}/" /tmp/register_pem_agent.sh
+    docker exec -t pem-agent${i} sed -i "s/%%AGENT_NAME%%/pemagent${i}/" /tmp/register_pem_agent.sh
+    docker exec -t pem-agent${i} bash --login -c "/tmp/register_pem_agent.sh"
+    docker exec pem-agent${i} service pemagent start
+  elif [[ ${PEM_VER} -eq 7 ]]
+  then
+    docker exec -t pem-agent${i} sed -i "s/bin/agent\/bin/" /tmp/register_pem_agent.sh
+    docker exec -t pem-agent${i} sed -i "s/pemagent/pemworker/" /tmp/register_pem_agent.sh
     docker exec -t pem-agent${i} sed -i "s/%%PEM_SERVER_IP%%/${MASTER_IP}/" /tmp/register_pem_agent.sh
     docker exec -t pem-agent${i} sed -i "s/%%AGENT_NAME%%/pemagent${i}/" /tmp/register_pem_agent.sh
     docker exec -t pem-agent${i} bash --login -c "/tmp/register_pem_agent.sh"
@@ -43,5 +52,5 @@ then
   printf "\e[0;33m>>> LAUNCHING PEM CONSOLE\n\e[0m"
   dockerip=`docker-machine ip docker-vm`;
   port=`docker ps -f name=pem-server | grep 8443 | sed -e 's/.*0.0.0.0:\(.*\)->8443.*/\1/'`
-  open https://${dockerip}:${port}/pem
+  open -a Safari https://${dockerip}:${port}/pem
 fi
