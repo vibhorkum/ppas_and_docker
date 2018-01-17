@@ -18,6 +18,7 @@ RUN rpm -ivh http://yum.enterprisedb.com/edbrepos/edb-repo-latest.noarch.rpm
 RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/edb.repo
 
 RUN yum -y update
+RUN yum -y install yum-plugin-ovl
 RUN yum -y --enablerepo=enterprisedb-dependencies --enablerepo=${REPONAME} install edb-as${FOO}-server.x86_64 sudo
 
 RUN echo 'root:root'|chpasswd
