@@ -17,7 +17,7 @@ fi
 # Create Containers
 printf "\e[0;33m==== Building containers for PEM cluster ====\n\e[0m"
 printf "\e[0;33m>>> SETTING UP PEM SERVER\n\e[0m"
-docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=pem-server --detach=true --name=pem-server pem${PEM_VER}_server:latest
+docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=pem-server --detach=true --name=pem-server pemserver:latest
 
 printf "\e[0;33m>>> SETTING UP PEM AGENTS\n\e[0m"
 docker exec pem-server service pemagent start
@@ -26,7 +26,7 @@ MASTER_IP=`docker exec -it pem-server ifconfig | grep Bcast | awk '{ print $2 }'
 for ((i=1;i<=${NUM_AGENTS};i++))
 do
   C_NAME="pem-agent${i}"
-  docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} pem${PEM_VER}_agent:latest
+  docker run --privileged=true --publish-all=true --interactive=false --tty=true -v /Users/${USER}/Desktop:/Desktop --hostname=${C_NAME} --detach=true --name=${C_NAME} pemagent:latest
   if [[ ${PEM_VER} -eq 6 ]]
   then
     docker exec -t pem-agent${i} sed -i "s/pemagent/pemworker/" /tmp/register_pem_agent.sh
