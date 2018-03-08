@@ -4,8 +4,6 @@
 
 REGISTRY_URL="docker-reg.ma.us.enterprisedb.com"
 REGISTRY_PORT="5000"
-REGISTRY_USERNAME=""
-REGISTRY_PASSWORD=""
 
 ### Sample output: {"repositories":["efm","epas10","epas96","pemagent","pemserver","ppas91","ppas92","ppas93","ppas94","ppas95","xdb"]}
 REPOS_RAW=`curl --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" -X GET https://${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}@${REGISTRY_URL}:${REGISTRY_PORT}/v2/_catalog`
