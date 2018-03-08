@@ -35,6 +35,8 @@
 # verify any  undefined shell variables
 set -u
 
+### The three DOCKER_* environment variables below should be commented out when not
+### using docker-machine or boot2docker
 export DOCKER_HOST=tcp://$(/usr/local/bin/boot2docker ip 2>/dev/null):2376
 export DOCKER_CERT_PATH=/Users/${USER}/.boot2docker/certs/boot2docker-vm
 export DOCKER_TLS_VERIFY=1
