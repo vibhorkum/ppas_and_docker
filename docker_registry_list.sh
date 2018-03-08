@@ -12,11 +12,12 @@ REPOS=`echo ${REPOS_RAW} | sed -e "s/.*\[//" -e "s/].*//" -e 's/"//g' -e "s/,/ /
 echo "Available images in ${REGISTRY_URL}:${REGISTRY_PORT} are:"
 for i in ${REPOS}
 do
+  echo "REPO ${i} -- "
   TAGS_RAW=`curl --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" -X GET https://${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}@${REGISTRY_URL}:${REGISTRY_PORT}/v2/${i}/tags/list`
   TAGS=`echo ${TAGS_RAW} | sed -e "s/.*\[//" -e "s/].*//" -e 's/"//g' -e "s/,/ /g"`
   for j in ${TAGS}
   do
-    echo "${i}:${j}"
+    echo "  ${i}:${j}"
   done
 done
 
