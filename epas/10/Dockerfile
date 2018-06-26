@@ -16,6 +16,7 @@ ENV PGLOG=/var/lib/edb/as${PGMAJOR}/pgstartup.log
 RUN rpm -ivh http://yum.enterprisedb.com/edbrepos/edb-repo-latest.noarch.rpm
 RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/edb.repo
 
+RUN yum -y install yum-plugin-ovl
 RUN yum -y update
 RUN yum -y --enablerepo=enterprisedb-dependencies --enablerepo=${REPONAME} install edb-as${PGMAJOR}-server.x86_64 sudo
 

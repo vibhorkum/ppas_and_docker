@@ -9,14 +9,14 @@ fi
 C_SUFFIX=${1}
 if [[ ${C_SUFFIX} -eq 6 ]]
 then
-  XDB_VERSION="6.0"
+  XDB_VERSION="6.2"
   IMAGE_NAME="xdb6:latest"
 else
   XDB_VERSION="5.1"
   IMAGE_NAME="xdb51:latest"
 fi
 
-num_nodes=4
+num_nodes=2
 if [[ ${2} == 'destroy' ]]
 then
   printf "\e[0;31m==== Destroying existing xDB cluster ====\n\e[0m"
@@ -40,7 +40,7 @@ do
   OTHER_MASTER_IPS="${OTHER_MASTER_IPS} ${IP}"
 done
 
-if [[ ${XDB_VERSION} == '6.0' ]]
+if [[ ${XDB_VERSION} == '6.2' ]]
 then
   for ((i=1;i<=${num_nodes};i++))
   do

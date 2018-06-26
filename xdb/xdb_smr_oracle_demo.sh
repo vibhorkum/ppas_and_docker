@@ -14,7 +14,7 @@ then
 elif [[ ${1} == '6' ]]
 then
   IMAGE_NAME="xdb6:latest"
-  XDB_VERSION="6.0"
+  XDB_VERSION="6.2"
 fi
 
 printf "\e[0;33m==== Building containers for xDB cluster ====\n\e[0m"
