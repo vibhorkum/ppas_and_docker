@@ -1,51 +1,37 @@
-FROM centos:6.6
+FROM centos:7
 MAINTAINER vibhor.aim@gmail.com
 
 ARG YUMUSERNAME
 ARG YUMPASSWORD
 
-ENV REPONAME=edbas10
-ENV PGMAJOR=10
+ENV REPONAME=edb-as12
+ENV PGMAJOR=12
 ENV PGPORT=5432
 ENV PGDATABASE=edb
 ENV PGUSER=enterprisedb
-ENV PATH=/usr/edb-as${PGMAJOR}/bin:${PATH}
+ENV PATH=/usr/edb/as${PGMAJOR}/bin:${PATH}
 ENV PGDATA=/var/lib/edb/as${PGMAJOR}/data
-ENV PGLOG=/var/lib/edb/as${PGMAJOR}/pgstartup.log
+ENV PGLOG=${PGDATA}/log/enterprisedb.log
+ENV NODE_TYPE=master
+ENV MASTER_HOST=""
+ENV MASTER_PORT=""
 
 RUN rpm -ivh http://yum.enterprisedb.com/edbrepos/edb-repo-latest.noarch.rpm
 RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/edb.repo
 
 RUN yum -y update
-RUN yum -y --enablerepo=enterprisedb-dependencies --enablerepo=${REPONAME} install edb-as${PGMAJOR}-server.x86_64 sudo
+RUN yum -y install epel-release
+RUN yum -y install edb-as${PGMAJOR}-server.x86_64 sudo net-tools
 
-RUN echo 'root:root'|chpasswd
-
-# setting postgres user for login
-RUN adduser --home-dir /home/postgres --create-home postgres
-RUN echo 'postgres   ALL=(ALL)   NOPASSWD: ALL' >> /etc/sudoers
-RUN echo 'postgres:postgres'|chpasswd
-
-RUN service edb-as-${PGMAJOR} initdb
-
-RUN sed -i "s/^PGPORT.*/PGPORT=${PGPORT}/" /etc/sysconfig/edb/as${PGMAJOR}/edb-as-${PGMAJOR}.sysconfig
 
 RUN echo "export PGPORT=${PGPORT}"         >> /etc/profile.d/pg_env.sh
 RUN echo "export PGDATABASE=${PGDATABASE}" >> /etc/profile.d/pg_env.sh
 RUN echo "export PGUSER=${PGUSER}"         >> /etc/profile.d/pg_env.sh
 RUN echo "export PATH=${PATH}"             >> /etc/profile.d/pg_env.sh
 
-RUN echo "local  all         all                 trust" >  ${PGDATA}/pg_hba.conf
-RUN echo "local  replication all                 trust" >> ${PGDATA}/pg_hba.conf
-RUN echo "host   replication repuser  0.0.0.0/0  trust" >> ${PGDATA}/pg_hba.conf
-RUN echo "host   all         all      0.0.0.0/0  trust" >> ${PGDATA}/pg_hba.conf
-
-RUN sed -i "s/^port = .*/port = ${PGPORT}/"         ${PGDATA}/postgresql.conf
-RUN sed -i "s/^logging_collector = off/logging_collector = on/" ${PGDATA}/postgresql.conf
-RUN sed -i "s/^#wal_level.*/wal_level=hot_standby/" ${PGDATA}/postgresql.conf
-RUN sed -i "s/^#wal_keep_segments = 0/wal_keep_segments = 500/" ${PGDATA}/postgresql.conf
-RUN sed -i "s/^#max_wal_senders = 0/max_wal_senders = 5/" ${PGDATA}/postgresql.conf
+COPY ./start_pg.sh /usr/edb/as12/bin/start_pg.sh
+RUN chmod +x /usr/edb/as12/bin/start_pg.sh
 
 EXPOSE ${PGPORT}
 
-CMD service edb-as-${PGMAJOR} start && tail -F ${PGLOG}
+CMD /usr/edb/as12/bin/start_pg.sh
