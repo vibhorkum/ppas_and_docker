@@ -50,7 +50,9 @@ done
 if [[ `uname` = 'Darwin' ]]
 then
   printf "\e[0;33m>>> LAUNCHING PEM CONSOLE\n\e[0m"
-  dockerip=`docker-machine ip docker-vm`;
+  dockerip=`localhost`
+  # If using docker-machine or boot2docker, then uncomment below
+  # dockerip=`docker-machine ip docker-vm`;
   port=`docker ps -f name=pem-server | grep 8443 | sed -e 's/.*0.0.0.0:\(.*\)->8443.*/\1/'`
   open -a Safari https://${dockerip}:${port}/pem
 fi

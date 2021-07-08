@@ -1,15 +1,21 @@
 FROM ppas95:latest
 MAINTAINER vibhor.aim@gmail.com
 
-ENV BART_VERSION=1.1
-ENV BART_PATH="/usr/edb-bart-${BART_VERSION}"
+ARG YUMUSERNAME
+ARG YUMPASSWORD
 
-RUN yum -y install yum-plugin-ovl
-RUN yum -y install epel-release tar
+ENV BART_VERSION=2.1
+ENV BART_PATH="/usr/edb/bart"
+
 RUN rpm -ivh http://yum.enterprisedb.com/edbrepos/edb-repo-latest.noarch.rpm
-RUN rpm -ivh https://get.enterprisedb.com/rpms/edb-bart-1.1.0-1.rhel6.x86_64.rpm
+RUN sed -i "s/<username>:<password>/${YUMUSERNAME}:${YUMPASSWORD}/" /etc/yum.repos.d/edb.repo
+RUN sed -i "s/enabled.*/enabled=1/" /etc/yum.repos.d/edb.repo
 
 # run update and install require packages.
+RUN yum -y install yum-plugin-ovl
+RUN yum -y install epel-release
+RUN yum -y install boost*
+RUN yum -y install edb-bart tar
 
 RUN mkdir /tmp/wal_archive
 RUN chown enterprisedb:enterprisedb /tmp/wal_archive
